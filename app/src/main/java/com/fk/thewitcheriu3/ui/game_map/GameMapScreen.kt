@@ -28,11 +28,11 @@ import com.fk.thewitcheriu3.R
 import com.fk.thewitcheriu3.domain.buyUnit
 import com.fk.thewitcheriu3.domain.entities.Cell
 import com.fk.thewitcheriu3.domain.entities.Character
-import com.fk.thewitcheriu3.domain.entities.Computer
+import com.fk.thewitcheriu3.domain.entities.heroes.Computer
 import com.fk.thewitcheriu3.domain.entities.GameMap
-import com.fk.thewitcheriu3.domain.entities.Monster
-import com.fk.thewitcheriu3.domain.entities.Player
-import com.fk.thewitcheriu3.domain.entities.Witcher
+import com.fk.thewitcheriu3.domain.entities.units.Monster
+import com.fk.thewitcheriu3.domain.entities.heroes.Player
+import com.fk.thewitcheriu3.domain.entities.units.Witcher
 import com.fk.thewitcheriu3.domain.selectedCharacterActions
 import com.fk.thewitcheriu3.domain.updateCellSets
 import com.fk.thewitcheriu3.ui.GameOverScreen
@@ -66,8 +66,8 @@ fun GameMapScreen() {
     }
 
     // Функция для обработки клика по клетке
-    fun handleCellClick(cell: Cell, x: Int, y: Int) {
-        selectedCell.value = Pair(x, y)
+    fun handleCellClick(cell: Cell) {
+        selectedCell.value = Pair(cell.xCoord, cell.yCoord)
 
         selectedCharacter.value?.let { selectedChar ->
             // Если персонаж уже выбран
@@ -137,7 +137,7 @@ fun GameMapScreen() {
                     selectedCell = selectedCell.value,
                     cellsInMoveRange = cellsInMoveRange.value,
                     cellsInAttackRange = cellsInAttackRange.value,
-                    onClick = { handleCellClick(cell, x, y) })
+                    onClick = { handleCellClick(cell) })
             }
         }
 

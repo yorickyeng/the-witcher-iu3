@@ -1,6 +1,8 @@
 package com.fk.thewitcheriu3.domain.entities
 
 import com.fk.thewitcheriu3.R
+import com.fk.thewitcheriu3.domain.entities.heroes.Hero
+import com.fk.thewitcheriu3.domain.entities.units.Unit
 
 data class Cell(
     val type: String,

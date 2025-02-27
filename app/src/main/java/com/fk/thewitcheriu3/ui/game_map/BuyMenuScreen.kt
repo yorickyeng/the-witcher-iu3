@@ -19,17 +19,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.fk.thewitcheriu3.domain.entities.BearSchoolWitcher
-import com.fk.thewitcheriu3.domain.entities.CatSchoolWitcher
-import com.fk.thewitcheriu3.domain.entities.GWENTWitcher
-import com.fk.thewitcheriu3.domain.entities.WolfSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.units.witchers.BearSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.units.witchers.CatSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.units.witchers.GWENTWitcher
+import com.fk.thewitcheriu3.domain.entities.units.witchers.WolfSchoolWitcher
 
 @Composable
 fun BuyMenuScreen(
     onBuy: (String) -> Unit, // Функция для покупки юнита
     onClose: () -> Unit // Функция для закрытия меню
 ) {
-    val inheritorsList = listOf(
+    val witchers = listOf(
         CatSchoolWitcher(),
         WolfSchoolWitcher(),
         BearSchoolWitcher(),
@@ -56,11 +56,11 @@ fun BuyMenuScreen(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            for (inheritor in inheritorsList) {
+            for (witcher in witchers) {
                 Button(
-                    onClick = { onBuy(inheritor.getType()) }, modifier = Modifier.padding(8.dp)
+                    onClick = { onBuy(witcher.getType()) }, modifier = Modifier.padding(8.dp)
                 ) {
-                    Text("${inheritor.getType()} (${inheritor.getPrice()} orens)")
+                    Text("${witcher.getType()} (${witcher.getPrice()} orens)")
                 }
             }
 

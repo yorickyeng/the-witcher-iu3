@@ -4,12 +4,11 @@ import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import com.fk.thewitcheriu3.domain.entities.Cell
 import com.fk.thewitcheriu3.domain.entities.Character
-import com.fk.thewitcheriu3.domain.entities.Computer
+import com.fk.thewitcheriu3.domain.entities.heroes.Computer
 import com.fk.thewitcheriu3.domain.entities.GameMap
-import com.fk.thewitcheriu3.domain.entities.Monster
-import com.fk.thewitcheriu3.domain.entities.Player
-import com.fk.thewitcheriu3.domain.entities.Witcher
-import kotlin.math.abs
+import com.fk.thewitcheriu3.domain.entities.units.Monster
+import com.fk.thewitcheriu3.domain.entities.heroes.Player
+import com.fk.thewitcheriu3.domain.entities.units.Witcher
 
 fun selectedCharacterActions(
     selectedCharacter: Character,
@@ -22,10 +21,20 @@ fun selectedCharacterActions(
     showBuyMenu: MutableState<Boolean>
 ) {
     val (selectedX, selectedY) = selectedCharacter.getPosition()
-    val distance = abs(selectedX - cell.xCoord) + abs(selectedY - cell.yCoord)
+    val distance =
+        measureDistance(
+            fromX = selectedX,
+            fromY = selectedY,
+            toX = cell.xCoord,
+            toY = cell.yCoord,
+            cell = cell,
+            character = selectedCharacter
+        )
 
     // Если клетка в пределах ходьбы
-    if (distance <= selectedCharacter.moveRange && (selectedCharacter is Player || selectedCharacter is Witcher)) {
+    if (distance <= selectedCharacter.moveRange &&
+        (selectedCharacter is Player || selectedCharacter is Witcher)
+    ) {
         when {
             // Если это мой замок
             cell.xCoord == 0 && cell.yCoord == 0 -> {
@@ -44,14 +53,15 @@ fun selectedCharacterActions(
                 if (movesCounter.intValue == player.units.size + 1) {
                     computersTurn(gameMap, player, computer, gameOver)
                     movesCounter.intValue = 0
-
                 }
             }
         }
     }
 
     // Если клетка занята и цель в пределах атаки
-    if (distance <= selectedCharacter.attackRange && (selectedCharacter is Player || selectedCharacter is Witcher)) {
+    if (distance <= selectedCharacter.attackRange &&
+        (selectedCharacter is Player || selectedCharacter is Witcher)
+    ) {
         when {
             cell.hero is Computer -> {
                 selectedCharacter.attack(cell.hero)
@@ -85,7 +95,14 @@ fun updateCellSets(
 
     for (i in 0 until gameMap.height) {
         for (j in 0 until gameMap.width) {
-            val distance = abs(selectedCharacter.xCoord - j) + abs(selectedCharacter.yCoord - i)
+            val distance = measureDistance(
+                fromX = selectedCharacter.xCoord,
+                fromY = selectedCharacter.yCoord,
+                toX = j,
+                toY = i,
+                cell = gameMap.map[i][j],
+                character = selectedCharacter
+            )
             if (distance <= selectedCharacter.moveRange) {
                 moveRangeCells.add(Pair(j, i))
             }

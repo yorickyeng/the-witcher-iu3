@@ -58,5 +58,5 @@ fun GameOverScreen(gameOver: String?, onClick: () -> Unit) {
 @Preview(showSystemUi = true)
 @Composable
 fun GameOverScreenPreview() {
-    GameOverScreen("", {})
+    GameOverScreen("") {}
 }

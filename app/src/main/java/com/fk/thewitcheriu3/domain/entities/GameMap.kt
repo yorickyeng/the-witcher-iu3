@@ -1,5 +1,12 @@
 package com.fk.thewitcheriu3.domain.entities
 
+import com.fk.thewitcheriu3.domain.entities.heroes.Computer
+import com.fk.thewitcheriu3.domain.entities.heroes.Player
+import com.fk.thewitcheriu3.domain.entities.units.monsters.Bruxa
+import com.fk.thewitcheriu3.domain.entities.units.monsters.Drowner
+import com.fk.thewitcheriu3.domain.entities.units.witchers.CatSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.units.witchers.WolfSchoolWitcher
+
 class GameMap(
     val width: Int, val height: Int
 ) {

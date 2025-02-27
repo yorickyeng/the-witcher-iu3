@@ -1,6 +1,9 @@
-package com.fk.thewitcheriu3.domain.entities
+package com.fk.thewitcheriu3.domain.entities.heroes
 
-import com.fk.thewitcheriu3.R
+import com.fk.thewitcheriu3.domain.entities.Cell
+import com.fk.thewitcheriu3.domain.entities.Character
+import com.fk.thewitcheriu3.domain.entities.GameMap
+import com.fk.thewitcheriu3.domain.entities.units.Unit
 
 abstract class Hero protected constructor(
     private val name: String, override var xCoord: Int, override var yCoord: Int, gameMap: GameMap
@@ -40,7 +43,6 @@ abstract class Hero protected constructor(
         )
         xCoord = x
         yCoord = y
-
     }
 
     override fun toString(): String {
@@ -58,20 +60,4 @@ abstract class Hero protected constructor(
             _money = value
         }
         get() = _money
-}
-
-class Player(
-    name: String, xCoord: Int, yCoord: Int, gameMap: GameMap
-) : Hero(
-    name, xCoord, yCoord, gameMap
-) {
-    override val texture = R.drawable.ciri
-}
-
-class Computer(
-    name: String, xCoord: Int, yCoord: Int, gameMap: GameMap
-) : Hero(
-    name, xCoord, yCoord, gameMap
-) {
-    override val texture = R.drawable.vilgefortz
 }
