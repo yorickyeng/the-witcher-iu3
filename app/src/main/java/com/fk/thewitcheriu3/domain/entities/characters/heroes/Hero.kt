@@ -1,9 +1,9 @@
-package com.fk.thewitcheriu3.domain.entities.heroes
+package com.fk.thewitcheriu3.domain.entities.characters.heroes
 
 import com.fk.thewitcheriu3.domain.entities.Cell
-import com.fk.thewitcheriu3.domain.entities.Character
+import com.fk.thewitcheriu3.domain.entities.characters.Character
 import com.fk.thewitcheriu3.domain.entities.GameMap
-import com.fk.thewitcheriu3.domain.entities.units.Unit
+import com.fk.thewitcheriu3.domain.entities.characters.units.Unit
 
 abstract class Hero protected constructor(
     private val name: String, override var xCoord: Int, override var yCoord: Int, gameMap: GameMap
@@ -16,8 +16,6 @@ abstract class Hero protected constructor(
     abstract override val texture: Int
 
     val units: MutableList<Unit> = mutableListOf()
-
-    fun getName() = name
 
     init {
         place(gameMap)
@@ -45,14 +43,15 @@ abstract class Hero protected constructor(
         yCoord = y
     }
 
-    override fun toString(): String {
-        return "$name\nHealth $health\n" + "Damage $damage\nMove Range $moveRange\n" +
+    override fun toString() =
+        "$name\nHealth $health\n" + "Damage $damage\nMove Range $moveRange\n" +
                 "Attack Range $attackRange\n${units.size} units\nMoney $money"
-    }
 
     fun addUnit(unit: Unit) {
         units.add(unit)
     }
+
+    fun getName() = name
 
     private var _money: Int = 200
     var money: Int

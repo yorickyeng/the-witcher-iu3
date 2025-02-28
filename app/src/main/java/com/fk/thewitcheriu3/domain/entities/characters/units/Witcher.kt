@@ -1,4 +1,4 @@
-package com.fk.thewitcheriu3.domain.entities.units
+package com.fk.thewitcheriu3.domain.entities.characters.units
 
 import com.fk.thewitcheriu3.domain.entities.GameMap
 import com.fk.thewitcheriu3.domain.getRandomCoords

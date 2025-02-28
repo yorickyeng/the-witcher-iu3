@@ -1,5 +1,6 @@
 package com.fk.thewitcheriu3.ui.game_map
 
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -25,18 +26,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fk.thewitcheriu3.R
+import com.fk.thewitcheriu3.domain.RaccoonComing
 import com.fk.thewitcheriu3.domain.buyUnit
 import com.fk.thewitcheriu3.domain.entities.Cell
-import com.fk.thewitcheriu3.domain.entities.Character
-import com.fk.thewitcheriu3.domain.entities.heroes.Computer
 import com.fk.thewitcheriu3.domain.entities.GameMap
-import com.fk.thewitcheriu3.domain.entities.units.Monster
-import com.fk.thewitcheriu3.domain.entities.heroes.Player
-import com.fk.thewitcheriu3.domain.entities.units.Witcher
+import com.fk.thewitcheriu3.domain.entities.characters.Character
+import com.fk.thewitcheriu3.domain.entities.characters.heroes.Hero
+import com.fk.thewitcheriu3.domain.entities.characters.units.Unit
 import com.fk.thewitcheriu3.domain.selectedCharacterActions
 import com.fk.thewitcheriu3.domain.updateCellSets
 import com.fk.thewitcheriu3.ui.GameOverScreen
 import kotlinx.coroutines.delay
+import kotlin.random.Random
 
 @Composable
 fun GameMapScreen() {
@@ -53,11 +54,35 @@ fun GameMapScreen() {
     val showBuyMenu = remember { mutableStateOf(false) }
     val gameOver = remember { mutableStateOf<String?>(null) }
 
-    val monsterTypes = arrayListOf("Drowner", "Bruxa")
+    val showRaccoon = remember { mutableStateOf(false) }
+    val raccoonTimer = remember { mutableStateOf(0L) }
+
     LaunchedEffect(Unit) {
-        delay(10000)
-        buyUnit(gameMap, computer, monsterTypes.random())
-    } // раз в 10 секунд появляется случайный монстр компа (если у него хватит денег)
+        while (true) {
+            // Случайное время появления енота (от 0 до 60 секунд)
+            val randomTime = Random.nextLong(0, 60000)
+            delay(randomTime)
+
+            // Проверяем, что список умерших не пустой
+            if (gameMap.anybodyDied()) {
+                showRaccoon.value = true
+                raccoonTimer.value = System.currentTimeMillis()
+
+                // Случайное количество воскрешений (от 1 до количества умерших)
+                val resurrectCount = Random.nextInt(1, gameMap.getDeathNoteSize() + 1)
+                repeat(resurrectCount) {
+                    gameMap.resurrect()
+                }
+
+                // Исчезновение енота через 7 секунд
+                delay(7000)
+                showRaccoon.value = false
+            }
+
+            // Задержка перед следующим появлением енота (60 секунд)
+            delay(60000)
+        }
+    }
 
     // Функция для обработки покупки юнита
     fun handleBuyUnit(unitType: String) {
@@ -82,10 +107,8 @@ fun GameMapScreen() {
         } ?: run {
             // Если персонаж ещё не выбран
             when {
-                cell.hero is Player -> selectedCharacter.value = cell.hero
-                cell.hero is Computer -> selectedCharacter.value = cell.hero
-                cell.unit is Witcher -> selectedCharacter.value = cell.unit
-                cell.unit is Monster -> selectedCharacter.value = cell.unit
+                cell.hero is Hero -> selectedCharacter.value = cell.hero
+                cell.unit is Unit -> selectedCharacter.value = cell.unit
             }
 
             // Обновляем клетки в пределах moveRange и attackRange
@@ -139,6 +162,10 @@ fun GameMapScreen() {
                     cellsInAttackRange = cellsInAttackRange.value,
                     onClick = { handleCellClick(cell) })
             }
+        }
+
+        if (showRaccoon.value) {
+            RaccoonComing()
         }
 
         if (showBuyMenu.value) {

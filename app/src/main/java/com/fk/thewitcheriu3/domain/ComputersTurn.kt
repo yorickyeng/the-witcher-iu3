@@ -1,17 +1,19 @@
 package com.fk.thewitcheriu3.domain
 
 import androidx.compose.runtime.MutableState
-import com.fk.thewitcheriu3.domain.entities.Character
-import com.fk.thewitcheriu3.domain.entities.heroes.Computer
 import com.fk.thewitcheriu3.domain.entities.GameMap
-import com.fk.thewitcheriu3.domain.entities.heroes.Player
-import com.fk.thewitcheriu3.domain.entities.units.Witcher
+import com.fk.thewitcheriu3.domain.entities.characters.Character
+import com.fk.thewitcheriu3.domain.entities.characters.heroes.Computer
+import com.fk.thewitcheriu3.domain.entities.characters.heroes.Player
 import kotlin.math.max
 import kotlin.math.min
 
 fun computersTurn(
     gameMap: GameMap, player: Player, computer: Computer, gameOver: MutableState<String?>
 ) {
+    val monsterTypes = arrayListOf("Drowner", "Bruxa")
+    buyUnit(gameMap, computer, monsterTypes.random())
+
     computerMoves(gameMap, player, computer, gameOver)
     computerAttacks(gameMap, player, computer, gameOver)
     for (i in 0 until computer.units.size) {
@@ -56,26 +58,9 @@ fun computerAttacks(
     gameMap: GameMap, player: Player, computer: Character, gameOver: MutableState<String?>
 ) {
     // Поиск цели для атаки
-    val attackTarget = findAttackTarget(gameMap, player, computer)
-    if (attackTarget != null) {
-        computer.attack(attackTarget)
-        if (attackTarget.health <= 0) {
-            val cell = gameMap.map[attackTarget.yCoord][attackTarget.xCoord]
-            gameMap.clearCell(cell)
-
-            when (attackTarget) {
-                is Witcher -> {
-                    player.units.remove(attackTarget)
-                    if (computer is Computer) {
-                        computer.money += attackTarget.getPrice()
-                    }
-                }
-
-                is Player -> {
-                    checkGameOver(player, computer, gameOver)
-                }
-            }
-        }
+    val target = findAttackTarget(gameMap, player, computer)
+    if (target != null) {
+        computer.attack(gameMap, target, gameOver)
     }
 }
 

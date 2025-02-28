@@ -3,12 +3,11 @@ package com.fk.thewitcheriu3.domain
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import com.fk.thewitcheriu3.domain.entities.Cell
-import com.fk.thewitcheriu3.domain.entities.Character
-import com.fk.thewitcheriu3.domain.entities.heroes.Computer
 import com.fk.thewitcheriu3.domain.entities.GameMap
-import com.fk.thewitcheriu3.domain.entities.units.Monster
-import com.fk.thewitcheriu3.domain.entities.heroes.Player
-import com.fk.thewitcheriu3.domain.entities.units.Witcher
+import com.fk.thewitcheriu3.domain.entities.characters.Character
+import com.fk.thewitcheriu3.domain.entities.characters.heroes.Computer
+import com.fk.thewitcheriu3.domain.entities.characters.heroes.Player
+import com.fk.thewitcheriu3.domain.entities.characters.units.Witcher
 
 fun selectedCharacterActions(
     selectedCharacter: Character,
@@ -50,10 +49,7 @@ fun selectedCharacterActions(
                 selectedCharacter.move(gameMap, cell.xCoord, cell.yCoord)
                 movesCounter.intValue += 1
 
-                if (movesCounter.intValue == player.units.size + 1) {
-                    computersTurn(gameMap, player, computer, gameOver)
-                    movesCounter.intValue = 0
-                }
+
             }
         }
     }
@@ -62,24 +58,16 @@ fun selectedCharacterActions(
     if (distance <= selectedCharacter.attackRange &&
         (selectedCharacter is Player || selectedCharacter is Witcher)
     ) {
-        when {
-            cell.hero is Computer -> {
-                selectedCharacter.attack(cell.hero)
-                if (cell.hero.health <= 0) {
-                    gameMap.clearCell(cell)
-                    checkGameOver(player, computer, gameOver)
-                }
-            }
-
-            cell.unit is Monster -> {
-                selectedCharacter.attack(cell.unit)
-                if (cell.unit.health <= 0) {
-                    gameMap.clearCell(cell)
-                    computer.units.remove(cell.unit)
-                    player.money += cell.unit.getPrice()
-                }
-            }
+        val target = cell.hero ?: cell.unit
+        if (target != null) {
+            selectedCharacter.attack(gameMap, target, gameOver)
+            movesCounter.intValue += 1
         }
+    }
+
+    if (movesCounter.intValue == player.units.size + 1) {
+        computersTurn(gameMap, player, computer, gameOver)
+        movesCounter.intValue = 0
     }
 }
 

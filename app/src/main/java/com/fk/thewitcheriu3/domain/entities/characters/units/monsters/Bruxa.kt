@@ -1,4 +1,4 @@
-package com.fk.thewitcheriu3.domain.entities.units.monsters
+package com.fk.thewitcheriu3.domain.entities.characters.units.monsters
 
 import com.fk.thewitcheriu3.R
 

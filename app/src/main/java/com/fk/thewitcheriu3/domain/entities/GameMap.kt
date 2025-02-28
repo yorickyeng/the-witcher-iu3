@@ -1,11 +1,13 @@
 package com.fk.thewitcheriu3.domain.entities
 
-import com.fk.thewitcheriu3.domain.entities.heroes.Computer
-import com.fk.thewitcheriu3.domain.entities.heroes.Player
-import com.fk.thewitcheriu3.domain.entities.units.monsters.Bruxa
-import com.fk.thewitcheriu3.domain.entities.units.monsters.Drowner
-import com.fk.thewitcheriu3.domain.entities.units.witchers.CatSchoolWitcher
-import com.fk.thewitcheriu3.domain.entities.units.witchers.WolfSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.characters.heroes.Computer
+import com.fk.thewitcheriu3.domain.entities.characters.Character
+import com.fk.thewitcheriu3.domain.entities.characters.heroes.Player
+import com.fk.thewitcheriu3.domain.entities.characters.units.monsters.Bruxa
+import com.fk.thewitcheriu3.domain.entities.characters.units.monsters.Drowner
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.CatSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.WolfSchoolWitcher
+import kotlin.random.Random
 
 class GameMap(
     val width: Int, val height: Int
@@ -21,6 +23,22 @@ class GameMap(
 
     fun getPlayer() = Ciri
     fun getComputer() = Vilgefortz
+
+    private var deathNote = mutableListOf<Character>()
+    fun died(character: Character) {
+        deathNote.add(character)
+    }
+
+    fun anybodyDied() = deathNote.isNotEmpty()
+    fun twoGuysDied() = deathNote.size >= 2
+    fun getDeathNoteSize() = deathNote.size
+    fun resurrect() {
+        if (anybodyDied()) {
+            val randomIndex = Random.nextInt(0, deathNote.size)
+            deathNote[randomIndex].place(this)
+            deathNote.removeAt(randomIndex)
+        }
+    }
 
     fun updateCell(cell: Cell) {
         map[cell.yCoord][cell.xCoord] = cell

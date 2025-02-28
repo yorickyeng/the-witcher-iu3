@@ -1,10 +1,10 @@
 package com.fk.thewitcheriu3.domain
 
 import com.fk.thewitcheriu3.domain.entities.Cell
-import com.fk.thewitcheriu3.domain.entities.Character
-import com.fk.thewitcheriu3.domain.entities.units.witchers.BearSchoolWitcher
-import com.fk.thewitcheriu3.domain.entities.units.witchers.CatSchoolWitcher
-import com.fk.thewitcheriu3.domain.entities.units.witchers.WolfSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.characters.Character
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.BearSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.CatSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.WolfSchoolWitcher
 import kotlin.math.abs
 
 fun measureDistance(fromX: Int, fromY: Int, toX: Int, toY: Int, cell: Cell, character: Character) =

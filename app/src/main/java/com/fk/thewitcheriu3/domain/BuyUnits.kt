@@ -1,14 +1,14 @@
 package com.fk.thewitcheriu3.domain
 
 import com.fk.thewitcheriu3.domain.entities.GameMap
-import com.fk.thewitcheriu3.domain.entities.heroes.Hero
-import com.fk.thewitcheriu3.domain.entities.units.Unit
-import com.fk.thewitcheriu3.domain.entities.units.monsters.Bruxa
-import com.fk.thewitcheriu3.domain.entities.units.monsters.Drowner
-import com.fk.thewitcheriu3.domain.entities.units.witchers.BearSchoolWitcher
-import com.fk.thewitcheriu3.domain.entities.units.witchers.CatSchoolWitcher
-import com.fk.thewitcheriu3.domain.entities.units.witchers.GWENTWitcher
-import com.fk.thewitcheriu3.domain.entities.units.witchers.WolfSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.characters.heroes.Hero
+import com.fk.thewitcheriu3.domain.entities.characters.units.Unit
+import com.fk.thewitcheriu3.domain.entities.characters.units.monsters.Bruxa
+import com.fk.thewitcheriu3.domain.entities.characters.units.monsters.Drowner
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.BearSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.CatSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.GWENTWitcher
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.WolfSchoolWitcher
 
 fun buyUnit(gameMap: GameMap, hero: Hero, unitType: String): Boolean {
     val units = listOf(
@@ -21,11 +21,8 @@ fun buyUnit(gameMap: GameMap, hero: Hero, unitType: String): Boolean {
     )
 
     for (unit in units) {
-        return when (unitType) {
-            unit.getType() -> {
-                buy(hero, unit, gameMap)
-            }
-            else -> false
+        if (unit.getType() == unitType) {
+            return buy(hero, unit, gameMap)
         }
     }
 
@@ -37,6 +34,10 @@ fun buy(hero: Hero, unit: Unit, gameMap: GameMap): Boolean {
         hero.money -= unit.getPrice()
         unit.place(gameMap)
         hero.addUnit(unit)
+        println("${hero.getName()} bought ${unit.getType()} for ${unit.getPrice()} orens")
         true
-    } else false
+    } else {
+        println("${hero.getName()} not enough money to buy ${unit.getPrice()}")
+        false
+    }
 }

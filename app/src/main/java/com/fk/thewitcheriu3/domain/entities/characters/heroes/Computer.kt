@@ -1,4 +1,4 @@
-package com.fk.thewitcheriu3.domain.entities.heroes
+package com.fk.thewitcheriu3.domain.entities.characters.heroes
 
 import com.fk.thewitcheriu3.R
 import com.fk.thewitcheriu3.domain.entities.GameMap

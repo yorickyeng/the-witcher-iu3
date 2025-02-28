@@ -1,7 +1,7 @@
-package com.fk.thewitcheriu3.domain.entities.units
+package com.fk.thewitcheriu3.domain.entities.characters.units
 
 import com.fk.thewitcheriu3.domain.entities.Cell
-import com.fk.thewitcheriu3.domain.entities.Character
+import com.fk.thewitcheriu3.domain.entities.characters.Character
 import com.fk.thewitcheriu3.domain.entities.GameMap
 
 abstract class Unit protected constructor(
@@ -42,7 +42,6 @@ abstract class Unit protected constructor(
         yCoord = y
     }
 
-    override fun toString(): String {
-        return "\n$type\nHealth $health\nDamage $damage\nMove Range $moveRange\nAttack Range $attackRange"
-    }
+    override fun toString() =
+        "\n$type\nHealth $health\nDamage $damage\nMove Range $moveRange\nAttack Range $attackRange"
 }

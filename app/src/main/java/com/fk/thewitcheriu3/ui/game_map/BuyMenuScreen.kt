@@ -19,10 +19,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.fk.thewitcheriu3.domain.entities.units.witchers.BearSchoolWitcher
-import com.fk.thewitcheriu3.domain.entities.units.witchers.CatSchoolWitcher
-import com.fk.thewitcheriu3.domain.entities.units.witchers.GWENTWitcher
-import com.fk.thewitcheriu3.domain.entities.units.witchers.WolfSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.BearSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.CatSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.GWENTWitcher
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.WolfSchoolWitcher
 
 @Composable
 fun BuyMenuScreen(
