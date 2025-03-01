@@ -103,11 +103,3 @@ fun updateCellSets(
     cellsInMoveRange.value = moveRangeCells
     cellsInAttackRange.value = attackRangeCells
 }
-
-fun checkGameOver(player: Player, computer: Character, gameOver: MutableState<String?>) {
-    if (player.health <= 0) {
-        gameOver.value = "lose" // Поражение
-    } else if (computer.health <= 0) {
-        gameOver.value = "win" // Победа
-    }
-}

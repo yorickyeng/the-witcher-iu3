@@ -1,6 +1,5 @@
 package com.fk.thewitcheriu3.ui.game_map
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fk.thewitcheriu3.R
+import com.fk.thewitcheriu3.domain.PlayBackgroundMusic
 import com.fk.thewitcheriu3.domain.RaccoonComing
 import com.fk.thewitcheriu3.domain.buyUnit
 import com.fk.thewitcheriu3.domain.entities.Cell
@@ -54,8 +55,12 @@ fun GameMapScreen() {
     val showBuyMenu = remember { mutableStateOf(false) }
     val gameOver = remember { mutableStateOf<String?>(null) }
 
+    if (gameOver.value != null) {
+        PlayBackgroundMusic(R.raw.bober_kurwa)
+    }
+
     val showRaccoon = remember { mutableStateOf(false) }
-    val raccoonTimer = remember { mutableStateOf(0L) }
+    val raccoonTimer = remember { mutableLongStateOf(0L) }
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -66,7 +71,7 @@ fun GameMapScreen() {
             // Проверяем, что список умерших не пустой
             if (gameMap.anybodyDied()) {
                 showRaccoon.value = true
-                raccoonTimer.value = System.currentTimeMillis()
+                raccoonTimer.longValue = System.currentTimeMillis()
 
                 // Случайное количество воскрешений (от 1 до количества умерших)
                 val resurrectCount = Random.nextInt(1, gameMap.getDeathNoteSize() + 1)
@@ -165,7 +170,7 @@ fun GameMapScreen() {
         }
 
         if (showRaccoon.value) {
-            RaccoonComing()
+            RaccoonComing(showRaccoon.value)
         }
 
         if (showBuyMenu.value) {

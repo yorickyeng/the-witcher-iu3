@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
 fun App() {
     var showNewGameScreen by rememberSaveable { mutableStateOf(true) }
 
-    PlayBackgroundMusic()
+    PlayBackgroundMusic(R.raw.kaer_morhen)
 
     Surface(
         color = MaterialTheme.colorScheme.background

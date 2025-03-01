@@ -7,8 +7,8 @@ class CatSchoolWitcher : Witcher(
     type = "Cat School Witcher",
     health = 75,
     damage = 100,
-    moveRange = 6,
-    attackRange = 4,
+    moveRange = 5,
+    attackRange = 3,
     price = 100
 ) {
     override val texture = R.drawable.gaetan
