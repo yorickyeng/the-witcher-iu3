@@ -128,7 +128,8 @@ fun RaccoonComing(showRaccoon: Boolean) {
                     .align(Alignment.BottomCenter)
             ) {
                 Text(
-                    text = "Isn't this a magical raccoon-necromancer? He hasn't been seen in ages... " + "\nNobody knows why does he come, he resurrects whoever he wants and vanishes.",
+                    text = "Isn't this a magical raccoon-necromancer? He hasn't been seen in ages... " +
+                            "\nNobody knows why does he come, he resurrects whoever he wants and vanishes.",
                     modifier = Modifier
                         .align(Alignment.Center)
                         .padding(16.dp),
