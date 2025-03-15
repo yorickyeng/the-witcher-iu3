@@ -57,7 +57,6 @@ class GameMapViewModel: ViewModel() {
             // Здесь cell - 2я выбранная клетка (выбор места движения или атаки)
 
             selectedCharacterMoveAndAttackLogic(selectedChar, targetCell = cell)
-
             changeTurn()
             resetSelected()
 
@@ -202,28 +201,30 @@ class GameMapViewModel: ViewModel() {
         while (true) {
             // Случайное время появления енота (от 0 до 60 секунд)
             val randomTime = Random.nextLong(0, 60000)
+            Log.w("Raccoon", "Raccoon is coming in ${randomTime / 1000} seconds!")
             delay(randomTime)
 
-            // Проверяем, что список умерших не пустой
             if (gameMap.anybodyDied()) {
                 showRaccoon.value = true
-                Log.i("GameMap", "Raccoon has come!")
+                Log.i("Raccoon", "Raccoon has appeared!")
 
                 // Случайное количество воскрешений (от 1 до количества умерших)
-                val resurrectCount = Random.nextInt(1, gameMap.getDeathNoteSize() + 1)
+                val resurrectCount = gameMap.getDeathNoteSize()
                 repeat(resurrectCount) {
                     gameMap.resurrect()
-                    Log.i("GameMap", "Resurrected a character. Total resurrected: $it")
+                    Log.i("Raccoon", "Raccoon resurrected a character. Total resurrected: ${it + 1}")
                 }
 
                 // Исчезновение енота через 7 секунд
                 delay(7000)
                 showRaccoon.value = false
+                Log.i("Raccoon", "Raccoon has disappeared after resurrecting $resurrectCount characters.")
+            } else {
+                Log.e("Raccoon", "Nobody died. Nobody to resurrect.")
             }
 
             // Задержка перед следующим появлением енота (60 секунд)
             delay(60000)
         }
     }
-
 }

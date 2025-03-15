@@ -1,7 +1,9 @@
 package com.fk.thewitcheriu3
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.MaterialTheme
@@ -32,18 +34,29 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun App() {
     var showNewGameScreen by rememberSaveable { mutableStateOf(true) }
+    var playPhonk by rememberSaveable { mutableStateOf(false) }
 
-    PlayBackgroundMusic(R.raw.kaer_morhen)
+    val music: MediaPlayer = if (playPhonk) {
+        PlayBackgroundMusic(R.raw.slapper)
+    } else {
+        PlayBackgroundMusic(R.raw.kaer_morhen)
+    }
 
     Surface(
         color = MaterialTheme.colorScheme.background
     ) {
         if (showNewGameScreen) {
-            NewGameScreen(onButtonClicked = { showNewGameScreen = false })
+            NewGameScreen(
+                onNewGameClicked = { showNewGameScreen = !showNewGameScreen },
+                onChangeMusicClicked = { playPhonk = !playPhonk },
+                onStopMusicClicked = { music.stop() }
+            )
         } else {
             GameMapScreen()
         }
     }
+
+    BackHandler { showNewGameScreen = !showNewGameScreen }
 }
 
 @Preview(showSystemUi = true)

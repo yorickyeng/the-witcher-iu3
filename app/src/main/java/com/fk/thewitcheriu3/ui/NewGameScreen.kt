@@ -21,7 +21,9 @@ import com.fk.thewitcheriu3.R
 
 @Composable
 fun NewGameScreen(
-    onButtonClicked: () -> Unit
+    onNewGameClicked: () -> Unit,
+    onChangeMusicClicked: () -> Unit,
+    onStopMusicClicked: () -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -46,16 +48,23 @@ fun NewGameScreen(
                     .padding(horizontal = 24.dp),
                 contentScale = ContentScale.Crop
             )
-            Button(
-                modifier = Modifier.padding(vertical = 10.dp),
-                onClick = onButtonClicked
-            ) {
-                Text(
-                    text = "New Game",
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Serif
-                )
-            }
+            NewGameScreenButton("New Game", onNewGameClicked)
+            NewGameScreenButton("Change Music", onChangeMusicClicked)
+            NewGameScreenButton("Stop Music", onStopMusicClicked)
         }
+    }
+}
+
+@Composable
+fun NewGameScreenButton(text: String, onButtonClicked: () -> Unit) {
+    Button(
+        modifier = Modifier.padding(vertical = 10.dp),
+        onClick = onButtonClicked
+    ) {
+        Text(
+            text = text,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily.Serif
+        )
     }
 }

@@ -8,17 +8,15 @@ import androidx.compose.ui.platform.LocalContext
 import com.fk.thewitcheriu3.R
 
 @Composable
-fun PlayBackgroundMusic(audiofile: Int) {
+fun PlayBackgroundMusic(audiofile: Int): MediaPlayer {
     val context = LocalContext.current
 
     // Создаём MediaPlayer
     val mediaPlayer = remember {
         MediaPlayer.create(context, audiofile).apply {
-            if (audiofile == R.raw.kaer_morhen) {
+            if (audiofile != R.raw.raccoon_appearance && audiofile != R.raw.bober_kurwa) {
                 isLooping = true
-            } // Зацикливаем музыку
-
-            if (audiofile == R.raw.raccoon_appearance || audiofile == R.raw.bober_kurwa) {
+            } else {
                 setVolume(2.0f, 2.0f) // Максимальная громкость
             }
             start() // Начинаем воспроизведение
@@ -31,4 +29,6 @@ fun PlayBackgroundMusic(audiofile: Int) {
             mediaPlayer.release() // Освобождаем ресурсы при завершении
         }
     }
+
+    return mediaPlayer
 }
