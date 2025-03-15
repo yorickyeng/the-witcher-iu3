@@ -26,8 +26,8 @@ import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.WolfSchool
 
 @Composable
 fun BuyMenuScreen(
-    onBuy: (String) -> Unit, // Функция для покупки юнита
-    onClose: () -> Unit // Функция для закрытия меню
+    onBuy: (String) -> Unit,
+    onClose: () -> Unit
 ) {
     val witchers = listOf(
         CatSchoolWitcher(),

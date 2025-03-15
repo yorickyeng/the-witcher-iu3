@@ -15,12 +15,8 @@ data class Cell(
         "road" -> R.drawable.road
         "field" -> R.drawable.field
         "forest" -> R.drawable.forest
-        "castle" -> when (Pair(xCoord, yCoord)) {
-            Pair(0, 0) -> R.drawable.kaer_morhen
-            Pair(9, 9) -> R.drawable.stygga
-            else -> R.drawable.field
-        }
-
+        "Kaer Morhen" -> R.drawable.kaer_morhen
+        "Zamek Stygga" -> R.drawable.stygga
         else -> R.drawable.field
     }
 }

@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fk.thewitcheriu3.R
-import com.fk.thewitcheriu3.domain.PlayBackgroundMusic
 import com.fk.thewitcheriu3.domain.RaccoonComing
 import com.fk.thewitcheriu3.ui.GameOverScreen
 
@@ -39,10 +38,6 @@ fun GameMapScreen() {
     val showBuyMenu = viewModel.showBuyMenu
     val gameOver = viewModel.gameOver
     val showRaccoon = viewModel.showRaccoon
-
-    if (gameOver.value != null) {
-        PlayBackgroundMusic(R.raw.bober_kurwa)
-    }
 
     LaunchedEffect(Unit) {
         viewModel.startRaccoonTimer()
@@ -92,12 +87,7 @@ fun GameMapScreen() {
 
         if (selectedCell.value != null) {
             val (x, y) = selectedCell.value!!
-            val cell = gameMap.map[y][x]
-            val info = when {
-                cell.hero != null -> cell.hero.toString()
-                cell.unit != null -> cell.unit.toString()
-                else -> cell.type
-            }
+            val info = viewModel.getCellInfo()
 
             Text(
                 text = "$info\nCell ($x, $y)",
@@ -122,6 +112,8 @@ fun GameMapScreen() {
             fontFamily = FontFamily.Serif
         )
 
-        GameOverScreen(gameOver.value, onClick = { viewModel.refreshGame() })
+        if (gameOver.value != null) {
+            GameOverScreen(gameOver.value, onClick = { viewModel.refreshGame() })
+        }
     }
 }

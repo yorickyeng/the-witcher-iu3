@@ -7,11 +7,11 @@ import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.CatSchoolW
 import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.WolfSchoolWitcher
 import kotlin.math.abs
 
-fun measureDistance(fromX: Int, fromY: Int, toX: Int, toY: Int, cell: Cell, character: Character) =
-    abs(fromX - toX) + abs(fromY - toY) + penalty(cell, character)
+fun measureDistance(fromX: Int, fromY: Int, toX: Int, toY: Int, targetCell: Cell, character: Character) =
+    abs(fromX - toX) + abs(fromY - toY) + penalty(targetCell, character)
 
-fun penalty(cell: Cell, character: Character): Int {
-    return when (cell.type) {
+fun penalty(targetCell: Cell, character: Character): Int {
+    return when (targetCell.type) {
         "road" -> -1
         "field" -> 1
         "forest" -> when (character) {

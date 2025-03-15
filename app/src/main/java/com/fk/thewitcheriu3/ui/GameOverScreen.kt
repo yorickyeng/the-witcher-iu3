@@ -17,39 +17,41 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.fk.thewitcheriu3.R
+import com.fk.thewitcheriu3.domain.PlayBackgroundMusic
 
 @Composable
 fun GameOverScreen(gameOver: String?, onClick: () -> Unit) {
-    if (gameOver != null) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.7f)) // Затемнение
+    PlayBackgroundMusic(R.raw.bober_kurwa)
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.7f)) // Затемнение
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+            Text(
+                text = if (gameOver == "win") "You Won" else "You Died",
+                color = if (gameOver == "win") Color.Green else Color.Red,
+                modifier = Modifier.padding(16.dp),
+                fontSize = 40.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Serif
+            )
+            Button(
+                onClick = { onClick() }
             ) {
                 Text(
-                    text = if (gameOver == "win") "You Won" else "You Died",
-                    color = if (gameOver == "win") Color.Green else Color.Red,
-                    modifier = Modifier.padding(16.dp),
-                    fontSize = 40.sp,
+                    text = "New Game +",
+                    modifier = Modifier.padding(10.dp),
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = FontFamily.Serif
                 )
-                Button(
-                    onClick = { onClick() }
-                ) {
-                    Text(
-                        text = "New Game +",
-                        modifier = Modifier.padding(10.dp),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Serif
-                    )
-                }
             }
         }
     }

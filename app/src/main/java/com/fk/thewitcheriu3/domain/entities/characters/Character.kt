@@ -1,9 +1,7 @@
 package com.fk.thewitcheriu3.domain.entities.characters
 
-import androidx.compose.runtime.MutableState
 import com.fk.thewitcheriu3.domain.entities.Cell
 import com.fk.thewitcheriu3.domain.entities.GameMap
-import com.fk.thewitcheriu3.domain.killCharacter
 
 interface Character {
     var health: Int
@@ -26,12 +24,8 @@ interface Character {
         )
     }
 
-    fun attack(gameMap: GameMap, target: Character, gameOver: MutableState<String?>) {
+    fun attack(target: Character) {
         target.health -= damage
-
-        if (target.health <= 0) {
-            killCharacter(gameMap, target, gameOver)
-        }
     }
 
     override fun toString(): String

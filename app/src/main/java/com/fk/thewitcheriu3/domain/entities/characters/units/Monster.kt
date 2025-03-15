@@ -18,7 +18,7 @@ abstract class Monster(
 
     final override fun place(gameMap: GameMap) {
         val (xRandom, yRandom) = getRandomCoords(
-            gameMap, gameMap.width - 4, gameMap.width, gameMap.height - 4, gameMap.height
+            gameMap, 6, 10, 6, 10
         )
         xCoord = xRandom
         yCoord = yRandom

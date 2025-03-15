@@ -46,7 +46,6 @@ fun App() {
     }
 }
 
-
 @Preview(showSystemUi = true)
 @Composable
 fun GameScreenPreview() {
