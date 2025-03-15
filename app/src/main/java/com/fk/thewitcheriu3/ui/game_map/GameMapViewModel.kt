@@ -1,5 +1,6 @@
 package com.fk.thewitcheriu3.ui.game_map
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -45,8 +46,8 @@ class GameMapViewModel: ViewModel() {
         private set
 
     private var computer by mutableStateOf(gameMap.getComputer())
-    private var selectedCharacter by mutableStateOf<Character?>(null)
-    private var movesCounter = mutableIntStateOf(0)
+    internal var selectedCharacter by mutableStateOf<Character?>(null)
+    internal var movesCounter = mutableIntStateOf(0)
 
     fun handleCellClick(cell: Cell) {
         selectedCell.value = Pair(cell.xCoord, cell.yCoord)
@@ -55,28 +56,7 @@ class GameMapViewModel: ViewModel() {
             // Если персонаж уже выбран
             // Здесь cell - 2я выбранная клетка (выбор места движения или атаки)
 
-            val (selectedX, selectedY) = selectedChar.getPosition()
-            val distance = measureDistance(
-                fromX = selectedX,
-                fromY = selectedY,
-                toX = cell.xCoord,
-                toY = cell.yCoord,
-                targetCell = cell,
-                character = selectedChar
-            )
-
-            if (selectedChar is Player || selectedChar is Witcher) {
-                if (cell.hero == null && cell.unit == null) {
-                    if (distance <= selectedChar.moveRange) {
-                        allyMoves(selectedChar, cell)
-                    }
-                } else {
-                    val target = (cell.hero ?: cell.unit)!!
-                    if (distance <= selectedChar.attackRange) {
-                        allyAttacks(selectedChar, target)
-                    }
-                }
-            }
+            selectedCharacterMoveAndAttackLogic(selectedChar, targetCell = cell)
 
             changeTurn()
             resetSelected()
@@ -131,6 +111,31 @@ class GameMapViewModel: ViewModel() {
         cellsInAttackRange.value = emptySet()
     }
 
+    internal fun selectedCharacterMoveAndAttackLogic(selectedChar: Character, targetCell: Cell) {
+        val (selectedX, selectedY) = selectedChar.getPosition()
+        val distance = measureDistance(
+            fromX = selectedX,
+            fromY = selectedY,
+            toX = targetCell.xCoord,
+            toY = targetCell.yCoord,
+            targetCell = targetCell,
+            character = selectedChar
+        )
+
+        if (selectedChar is Player || selectedChar is Witcher) {
+            if (targetCell.hero == null && targetCell.unit == null) {
+                if (distance <= selectedChar.moveRange) {
+                    allyMoves(selectedChar, targetCell)
+                }
+            } else {
+                val target = (targetCell.hero ?: targetCell.unit)!!
+                if (distance <= selectedChar.attackRange) {
+                    allyAttacks(selectedChar, target)
+                }
+            }
+        }
+    }
+
     private fun changeTurn() {
         if (movesCounter.intValue == player.units.size + 1) {
             computersTurn()
@@ -170,7 +175,7 @@ class GameMapViewModel: ViewModel() {
         }
     }
 
-    private fun allyMoves(ally: Character, targetCell: Cell) {
+    internal fun allyMoves(ally: Character, targetCell: Cell) {
         ally.move(gameMap, targetCell.xCoord, targetCell.yCoord)
         movesCounter.intValue += 1
 
@@ -202,11 +207,13 @@ class GameMapViewModel: ViewModel() {
             // Проверяем, что список умерших не пустой
             if (gameMap.anybodyDied()) {
                 showRaccoon.value = true
+                Log.i("GameMap", "Raccoon has come!")
 
                 // Случайное количество воскрешений (от 1 до количества умерших)
                 val resurrectCount = Random.nextInt(1, gameMap.getDeathNoteSize() + 1)
                 repeat(resurrectCount) {
                     gameMap.resurrect()
+                    Log.i("GameMap", "Resurrected a character. Total resurrected: $it")
                 }
 
                 // Исчезновение енота через 7 секунд
@@ -218,4 +225,5 @@ class GameMapViewModel: ViewModel() {
             delay(60000)
         }
     }
+
 }

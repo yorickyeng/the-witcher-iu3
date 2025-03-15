@@ -50,7 +50,8 @@ class GameMap(
         )
     }
 
-    fun updateRangeCells(selectedCharacter: Character): Pair<MutableSet<Pair<Int, Int>>, MutableSet<Pair<Int, Int>>> {
+    fun updateRangeCells(selectedCharacter: Character):
+            Pair<MutableSet<Pair<Int, Int>>, MutableSet<Pair<Int, Int>>> {
         val moveRangeCells = mutableSetOf<Pair<Int, Int>>()
         val attackRangeCells = mutableSetOf<Pair<Int, Int>>()
 
@@ -98,7 +99,9 @@ class GameMap(
     fun checkGameOver(): String? {
         return when {
             Ciri.health <= 0 -> "lose"
+            Vilgefortz.xCoord == 0 && Vilgefortz.yCoord == 0 -> "lose"
             Vilgefortz.health <= 0 -> "win"
+            Ciri.xCoord == 9 && Ciri.yCoord == 9 -> "win"
             else -> null
         }
     }
@@ -187,7 +190,7 @@ class GameMap(
         return Triple(distance, xRandom, yRandom)
     }
 
-    private fun died(character: Character) {
+    internal fun died(character: Character) {
         deathNote.add(character)
     }
 
