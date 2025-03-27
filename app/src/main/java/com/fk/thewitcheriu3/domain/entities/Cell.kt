@@ -3,11 +3,14 @@ package com.fk.thewitcheriu3.domain.entities
 import com.fk.thewitcheriu3.R
 import com.fk.thewitcheriu3.domain.entities.characters.heroes.Hero
 import com.fk.thewitcheriu3.domain.entities.characters.units.Unit
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
+@Serializable
 data class Cell(
     val type: String,
-    val hero: Hero? = null,
-    val unit: Unit? = null,
+    @Transient val hero: Hero? = null,
+    @Transient val unit: Unit? = null,
     val xCoord: Int,
     val yCoord: Int
 ) {

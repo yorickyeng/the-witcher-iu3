@@ -2,15 +2,12 @@ package com.fk.thewitcheriu3.domain.entities
 
 import com.fk.thewitcheriu3.domain.entities.characters.Character
 import com.fk.thewitcheriu3.domain.entities.characters.heroes.Computer
-import com.fk.thewitcheriu3.domain.entities.characters.heroes.Hero
 import com.fk.thewitcheriu3.domain.entities.characters.heroes.Player
 import com.fk.thewitcheriu3.domain.entities.characters.units.Monster
 import com.fk.thewitcheriu3.domain.entities.characters.units.Witcher
 import com.fk.thewitcheriu3.domain.entities.characters.units.monsters.Bruxa
 import com.fk.thewitcheriu3.domain.entities.characters.units.monsters.Drowner
-import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.BearSchoolWitcher
 import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.CatSchoolWitcher
-import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.GWENTWitcher
 import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.WolfSchoolWitcher
 import com.fk.thewitcheriu3.domain.getRandomCoords
 import com.fk.thewitcheriu3.domain.measureDistance
@@ -26,19 +23,19 @@ class GameMap(
         }
     }
 
-    private var Ciri: Player
-    private var Vilgefortz: Computer
+    private lateinit var player: Player
+    private lateinit var computer: Computer
 
     private var deathNote = mutableListOf<Character>()
 
-    fun getPlayer() = Ciri
-    fun getComputer() = Vilgefortz
+    fun getPlayer() = player
+    fun getComputer() = computer
 
     fun updateCell(cell: Cell) {
         map[cell.yCoord][cell.xCoord] = cell
     }
 
-    private fun clearCell(cell: Cell) {
+    fun clearCell(cell: Cell) {
         updateCell(
             Cell(
                 type = cell.type,
@@ -50,8 +47,7 @@ class GameMap(
         )
     }
 
-    fun updateRangeCells(selectedCharacter: Character):
-            Pair<MutableSet<Pair<Int, Int>>, MutableSet<Pair<Int, Int>>> {
+    fun updateRangeCells(selectedCharacter: Character): Pair<MutableSet<Pair<Int, Int>>, MutableSet<Pair<Int, Int>>> {
         val moveRangeCells = mutableSetOf<Pair<Int, Int>>()
         val attackRangeCells = mutableSetOf<Pair<Int, Int>>()
 
@@ -77,64 +73,18 @@ class GameMap(
         return Pair(moveRangeCells, attackRangeCells)
     }
 
-    fun buyUnit(hero: Hero, unitType: String): Boolean {
-        val units = listOf(
-            CatSchoolWitcher(),
-            WolfSchoolWitcher(),
-            BearSchoolWitcher(),
-            GWENTWitcher(),
-            Drowner(),
-            Bruxa()
-        )
-
-        for (unit in units) {
-            if (unit.getType() == unitType) {
-                return hero.buy(this, unit)
-            }
-        }
-
-        return false
-    }
-
     fun checkGameOver(): String? {
         return when {
-            Ciri.health <= 0 -> "lose"
-            Vilgefortz.xCoord == 0 && Vilgefortz.yCoord == 0 -> "lose"
-            Vilgefortz.health <= 0 -> "win"
-            Ciri.xCoord == 9 && Ciri.yCoord == 9 -> "win"
+            player.health <= 0 -> "lose"
+            computer.xCoord == 0 && computer.yCoord == 0 -> "lose"
+            computer.health <= 0 -> "win"
+            player.xCoord == 9 && player.yCoord == 9 -> "win"
             else -> null
         }
     }
 
-    fun characterAttacks(character: Character, target: Character): String? {
-        character.attack(target)
-        if (target.health <= 0) {
-            killCharacter(target)
-            return checkGameOver()
-        }
-        return null
-    }
-
-    private fun killCharacter(target: Character) {
-        val cell = map[target.yCoord][target.xCoord]
-        clearCell(cell)
-        died(target)
-
-        when (target) {
-            is Witcher -> {
-                Ciri.units.remove(target)
-                Vilgefortz.money += target.getPrice()
-            }
-
-            is Monster -> {
-                Vilgefortz.units.remove(target)
-                Ciri.money += target.getPrice()
-            }
-        }
-    }
-
     fun findAttackTargetForEnemy(enemy: Character): Character? {
-        val (playerX, playerY) = Ciri.getPosition()
+        val (playerX, playerY) = player.getPosition()
         val (computerX, computerY) = enemy.getPosition()
 
         // Проверяем героя игрока
@@ -147,11 +97,11 @@ class GameMap(
             character = enemy
         )
         if (distance <= enemy.attackRange) {
-            return Ciri
+            return player
         }
 
         // Проверяем юнитов игрока
-        for (unit in Ciri.units) {
+        for (unit in player.units) {
             val (unitX, unitY) = unit.getPosition()
             val distanceToUnit = measureDistance(
                 fromX = computerX,
@@ -202,12 +152,17 @@ class GameMap(
             for (dead in deathNote) {
                 dead.health = 100
                 dead.place(this)
+                if (dead is Monster) {
+                    computer.units.add(dead)
+                } else if (dead is Witcher) {
+                    player.units.add(dead)
+                }
             }
             deathNote.clear()
         }
     }
 
-    init { // map initialization
+    fun initDefaultMap() {
         for (i in 0 until width) {
             updateCell(Cell(type = "road", xCoord = i, yCoord = i))
         }
@@ -231,25 +186,34 @@ class GameMap(
         updateCell(Cell(type = "Kaer Morhen", xCoord = 0, yCoord = 0))
         updateCell(Cell(type = "Zamek Stygga", xCoord = width - 1, yCoord = height - 1))
 
-        Ciri = Player(name = "Cirilla Fiona Elen Riannon", 0, 1, this)
-        Vilgefortz = Computer(name = "Vilgefortz of Roggeveen", 9, 8, this)
+        initCharacters()
+    }
 
-        val Gaetan = CatSchoolWitcher()
-        Gaetan.place(this)
-        Ciri.addUnit(Gaetan)
+    fun initCharacters() {
+        player = Player(name = "Cirilla Fiona Elen Riannon", 0, 1, this)
+        computer = Computer(name = "computer of Roggeveen", 9, 8, this)
 
-        val Geralt = WolfSchoolWitcher()
-        Geralt.place(this)
-        Ciri.addUnit(Geralt)
+        val catSchoolWitcher = CatSchoolWitcher()
+        catSchoolWitcher.place(this)
+        player.addUnit(catSchoolWitcher)
+
+        val wolfSchoolWitcher = WolfSchoolWitcher()
+        wolfSchoolWitcher.place(this)
+        player.addUnit(wolfSchoolWitcher)
 
         for (i in 5 until 8) {
             val drowner = Drowner()
             drowner.place(this)
-            Vilgefortz.addUnit(drowner)
+            computer.addUnit(drowner)
         }
 
         val bruxa = Bruxa()
         bruxa.place(this)
-        Vilgefortz.addUnit(bruxa)
+        computer.addUnit(bruxa)
+    }
+
+    init {
+        initDefaultMap()
+        initCharacters()
     }
 }

@@ -1,4 +1,4 @@
-package com.fk.thewitcheriu3.ui.game_map
+package com.fk.thewitcheriu3.ui.templates
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
@@ -17,9 +17,9 @@ import com.fk.thewitcheriu3.domain.entities.Cell
 @Composable
 fun CellView(
     cell: Cell,
-    selectedCell: Pair<Int, Int>?,
-    cellsInMoveRange: Set<Pair<Int, Int>>,
-    cellsInAttackRange: Set<Pair<Int, Int>>,
+    selectedCell: Pair<Int, Int>? = null,
+    cellsInMoveRange: Set<Pair<Int, Int>> = emptySet(),
+    cellsInAttackRange: Set<Pair<Int, Int>> = emptySet(),
     onClick: () -> Unit
 ) {
     val borderColor by animateColorAsState(

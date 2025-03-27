@@ -44,13 +44,13 @@ fun BuyMenuScreen(
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
-                .background(MaterialTheme.colorScheme.inverseSurface, shape = CircleShape)
+                .background(MaterialTheme.colorScheme.background, shape = CircleShape)
                 .border(border = BorderStroke(3.dp, Color.Black), shape = CircleShape)
                 .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = "Buy Unit",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)

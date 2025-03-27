@@ -38,47 +38,41 @@ fun RaccoonComing(showRaccoon: Boolean) {
     PlayBackgroundMusic(R.raw.raccoon_appearance)
     PlayBackgroundMusic(R.raw.bober_kurwa)
 
-    // Состояние для управления затемнением и сообщением
-    var showOverlay by remember { mutableStateOf(false) }
-
-    // Состояние для управления анимацией
-    var isVisible by remember { mutableStateOf(false) }
+    var showOverlay by remember { mutableStateOf(false) } // затемнение и сообщение
+    var isVisible by remember { mutableStateOf(false) } // анимация
 
     val alpha by animateFloatAsState(
-        targetValue = if (isVisible) 1f else 0f, // Прозрачность от 0 до 1
-        animationSpec = tween(durationMillis = 1000),
-        label = "alpha" // Длительность анимации 1 секунда
+        targetValue = if (isVisible) 1f else 0f, // прозрачность от 0 до 1
+        animationSpec = tween(durationMillis = 1000), // длительность анимации 1 секунда
+        label = "alpha"
     )
     val scale by animateFloatAsState(
-        targetValue = if (isVisible) 1f else 0.5f, // Масштаб от 0.5 до 1
+        targetValue = if (isVisible) 1f else 0.5f, // масштаб
         animationSpec = tween(durationMillis = 1000),
-        label = "scale" // Длительность анимации 1 секунда
+        label = "scale"
     )
 
-    // Запуск анимации при появлении енота
+    // запуск анимации при появлении енота
     LaunchedEffect(showRaccoon) {
         if (showRaccoon) {
             isVisible = true
-            showOverlay = true // Показываем затемнение и сообщение
-            delay(2000) // Затемнение и сообщение остаются на 2 секунды
-            showOverlay = false // Убираем затемнение и сообщение
+            showOverlay = true
+            delay(2000)
+            showOverlay = false
         }
     }
 
-    // Добавляем изображение енота
     BoxWithConstraints(
         modifier = Modifier.fillMaxSize()
     ) {
-        val cellSize = maxWidth / 10 // Размер одной клетки
+        val cellSize = maxWidth / 10
         val showText = remember { mutableStateOf(false) }
 
-        // Позиция и размер изображения енота
-        val raccoonWidth = cellSize * 2 // Ширина = 2 клетки
-        val raccoonHeight = cellSize * 2 // Высота = 2 клетки
-        val raccoonX = cellSize * 2 // Начальная координата X = 2 клетки
-        val raccoonY = cellSize * 6 // Начальная координата Y = 6 клеток
+        val raccoonWidth = cellSize * 2
+        val raccoonHeight = cellSize * 2
+        val raccoonX = cellSize * 2
+        val raccoonY = cellSize * 6
 
-        // Затемнение экрана и сообщение
         if (showOverlay) {
             Box(contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -107,9 +101,9 @@ fun RaccoonComing(showRaccoon: Boolean) {
             Image(painter = painterResource(R.drawable.raccoon),
                 contentDescription = "Raccoon Area",
                 modifier = Modifier
-                    .absoluteOffset(raccoonX, raccoonY) // Позиция
-                    .size(raccoonWidth, raccoonHeight) // Размер
-                    .graphicsLayer {
+                    .absoluteOffset(raccoonX, raccoonY) // позиция
+                    .size(raccoonWidth, raccoonHeight)
+                    .graphicsLayer { // анимация
                         this.alpha = alpha
                         this.scaleX = scale
                         this.scaleY = scale
@@ -127,8 +121,7 @@ fun RaccoonComing(showRaccoon: Boolean) {
                     .align(Alignment.BottomCenter)
             ) {
                 Text(
-                    text = "Isn't this a magical raccoon-necromancer? He hasn't been seen in ages... " +
-                            "\nNobody knows why does he come, he resurrects whoever he wants and vanishes.",
+                    text = "Isn't this a magical raccoon-necromancer? He hasn't been seen in ages... ",
                     modifier = Modifier
                         .align(Alignment.Center)
                         .padding(16.dp),

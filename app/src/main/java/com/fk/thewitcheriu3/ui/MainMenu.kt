@@ -7,24 +7,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.fk.thewitcheriu3.R
+import com.fk.thewitcheriu3.domain.entities.NavRoutes
+import com.fk.thewitcheriu3.ui.templates.MainMenuButton
 
 @Composable
-fun NewGameScreen(
-    onNewGameClicked: () -> Unit,
-    onChangeMusicClicked: () -> Unit,
-    onStopMusicClicked: () -> Unit
-) {
+fun MainMenu(navController: NavController) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -48,23 +43,9 @@ fun NewGameScreen(
                     .padding(horizontal = 24.dp),
                 contentScale = ContentScale.Crop
             )
-            NewGameScreenButton("New Game", onNewGameClicked)
-            NewGameScreenButton("Change Music", onChangeMusicClicked)
-            NewGameScreenButton("Stop Music", onStopMusicClicked)
+            MainMenuButton("New Game") { navController.navigate(NavRoutes.NewGame.route) }
+            MainMenuButton("Create Custom Map") { navController.navigate(NavRoutes.MapCreator.route) }
+            MainMenuButton("Settings") { navController.navigate(NavRoutes.Settings.route) }
         }
-    }
-}
-
-@Composable
-fun NewGameScreenButton(text: String, onButtonClicked: () -> Unit) {
-    Button(
-        modifier = Modifier.padding(vertical = 10.dp),
-        onClick = onButtonClicked
-    ) {
-        Text(
-            text = text,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Serif
-        )
     }
 }

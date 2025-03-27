@@ -1,4 +1,4 @@
-package com.fk.thewitcheriu3.ui
+package com.fk.thewitcheriu3.ui.game_map
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

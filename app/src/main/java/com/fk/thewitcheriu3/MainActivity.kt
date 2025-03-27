@@ -14,8 +14,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.fk.thewitcheriu3.domain.PlayBackgroundMusic
-import com.fk.thewitcheriu3.ui.NewGameScreen
+import com.fk.thewitcheriu3.domain.entities.NavRoutes
+import com.fk.thewitcheriu3.ui.MainMenu
+import com.fk.thewitcheriu3.ui.SettingsScreen
+import com.fk.thewitcheriu3.ui.game_map.GameMapCreatorScreen
 import com.fk.thewitcheriu3.ui.game_map.GameMapScreen
 import com.fk.thewitcheriu3.ui.theme.TheWitcherIU3Theme
 
@@ -25,7 +31,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TheWitcherIU3Theme {
-                App()
+                Surface(color = MaterialTheme.colorScheme.background) {
+                    App()
+                }
             }
         }
     }
@@ -33,7 +41,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun App() {
-    var showNewGameScreen by rememberSaveable { mutableStateOf(true) }
     var playPhonk by rememberSaveable { mutableStateOf(false) }
 
     val music: MediaPlayer = if (playPhonk) {
@@ -42,21 +49,21 @@ fun App() {
         PlayBackgroundMusic(R.raw.kaer_morhen)
     }
 
-    Surface(
-        color = MaterialTheme.colorScheme.background
-    ) {
-        if (showNewGameScreen) {
-            NewGameScreen(
-                onNewGameClicked = { showNewGameScreen = !showNewGameScreen },
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = NavRoutes.MainMenu.route) {
+        composable(NavRoutes.MainMenu.route) {
+            MainMenu(navController = navController)
+        }
+        composable(NavRoutes.NewGame.route) { GameMapScreen() }
+        composable(NavRoutes.MapCreator.route) { GameMapCreatorScreen(navController = navController) }
+        composable(NavRoutes.Settings.route) {
+            SettingsScreen(navController = navController,
                 onChangeMusicClicked = { playPhonk = !playPhonk },
-                onStopMusicClicked = { music.stop() }
-            )
-        } else {
-            GameMapScreen()
+                onStopMusicClicked = { music.stop() })
         }
     }
 
-    BackHandler { showNewGameScreen = !showNewGameScreen }
+    BackHandler { navController.navigate(NavRoutes.MainMenu.route) }
 }
 
 @Preview(showSystemUi = true)

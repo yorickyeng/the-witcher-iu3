@@ -15,16 +15,26 @@ import com.fk.thewitcheriu3.domain.entities.characters.heroes.Player
 import com.fk.thewitcheriu3.domain.entities.characters.units.Monster
 import com.fk.thewitcheriu3.domain.entities.characters.units.Unit
 import com.fk.thewitcheriu3.domain.entities.characters.units.Witcher
+import com.fk.thewitcheriu3.domain.entities.characters.units.monsters.Bruxa
+import com.fk.thewitcheriu3.domain.entities.characters.units.monsters.Drowner
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.BearSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.CatSchoolWitcher
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.GWENTWitcher
+import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.WolfSchoolWitcher
 import com.fk.thewitcheriu3.domain.measureDistance
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
-class GameMapViewModel: ViewModel() {
+class GameMapViewModel : ViewModel() {
 
     var gameMap by mutableStateOf(GameMap(10, 10))
         private set
 
-    var player by mutableStateOf(gameMap.getPlayer())
+    private var player by mutableStateOf(gameMap.getPlayer())
+    private var computer by mutableStateOf(gameMap.getComputer())
+    internal var selectedCharacter by mutableStateOf<Character?>(null)
+
+    var movesCounter = mutableIntStateOf(0)
         private set
 
     var selectedCell = mutableStateOf<Pair<Int, Int>?>(null)
@@ -45,9 +55,8 @@ class GameMapViewModel: ViewModel() {
     var gameOver = mutableStateOf<String?>(null)
         private set
 
-    private var computer by mutableStateOf(gameMap.getComputer())
-    internal var selectedCharacter by mutableStateOf<Character?>(null)
-    internal var movesCounter = mutableIntStateOf(0)
+    var playersMoney by mutableIntStateOf(player.money)
+        private set
 
     fun handleCellClick(cell: Cell) {
         selectedCell.value = Pair(cell.xCoord, cell.yCoord)
@@ -76,9 +85,8 @@ class GameMapViewModel: ViewModel() {
         }
     }
 
-    fun handleBuyUnit(unitType: String) {
-        gameMap.buyUnit(player, unitType)
-        showBuyMenu.value = false
+    fun playerBuysUnit(unitType: String) {
+        buyUnit(player, unitType)
     }
 
     fun refreshGame() {
@@ -135,6 +143,29 @@ class GameMapViewModel: ViewModel() {
         }
     }
 
+    internal fun allyMoves(ally: Character, targetCell: Cell) {
+        when (targetCell.type) {
+            // Если это мой замок
+            "Kaer Morhen" -> showBuyMenu.value = true
+
+            // Если это вражеский замок
+            "Zamek Stygga" -> {
+                computer.health = 0
+                gameOver.value = gameMap.checkGameOver()
+            }
+        }
+
+        ally.move(gameMap, targetCell.xCoord, targetCell.yCoord)
+        movesCounter.intValue += 1
+    }
+
+    private fun allyAttacks(ally: Character, target: Character) {
+        if (target is Computer || target is Monster) {
+            gameOver.value = characterAttacks(ally, target)
+            movesCounter.intValue += 1
+        }
+    }
+
     private fun changeTurn() {
         if (movesCounter.intValue == player.units.size + 1) {
             computersTurn()
@@ -152,7 +183,7 @@ class GameMapViewModel: ViewModel() {
         }
 
         val monsterTypes = arrayListOf("Drowner", "Bruxa")
-        gameMap.buyUnit(computer, monsterTypes.random())
+        buyUnit(computer, monsterTypes.random())
     }
 
     private fun enemyMoves(enemy: Character = computer) {
@@ -170,36 +201,72 @@ class GameMapViewModel: ViewModel() {
     private fun enemyAttacks(enemy: Character = computer) {
         val target = gameMap.findAttackTargetForEnemy(enemy)
         if (target != null) {
-            gameOver.value = gameMap.characterAttacks(enemy, target)
+            gameOver.value = characterAttacks(enemy, target)
         }
     }
 
-    internal fun allyMoves(ally: Character, targetCell: Cell) {
-        ally.move(gameMap, targetCell.xCoord, targetCell.yCoord)
-        movesCounter.intValue += 1
+    private fun characterAttacks(character: Character, target: Character): String? {
+        character.attack(target)
+        if (target.health <= 0) {
+            killCharacter(target)
+            return gameMap.checkGameOver()
+        }
+        return null
+    }
 
-        when (targetCell.type) {
-            // Если это мой замок
-            "Kaer Morhen" -> showBuyMenu.value = true
+    private fun killCharacter(target: Character) {
+        val cell = gameMap.map[target.yCoord][target.xCoord]
+        gameMap.clearCell(cell)
+        gameMap.died(target)
 
-            // Если это вражеский замок
-            "Zamek Stygga" -> {
-                computer.health = 0
-                gameOver.value = gameMap.checkGameOver()
+        when (target) {
+            is Witcher -> {
+                player.units.remove(target)
+                computer.money += target.getPrice()
+            }
+
+            is Monster -> {
+                computer.units.remove(target)
+                playersMoney += target.getPrice()
             }
         }
     }
 
-    private fun allyAttacks(ally: Character, target: Character) {
-        if (target is Computer || target is Monster) {
-            gameOver.value = gameMap.characterAttacks(ally, target)
-            movesCounter.intValue += 1
+    private fun buyUnit(hero: Hero, unitType: String): Boolean {
+        val units = listOf(
+            CatSchoolWitcher(),
+            WolfSchoolWitcher(),
+            BearSchoolWitcher(),
+            GWENTWitcher(),
+            Drowner(),
+            Bruxa()
+        )
+
+        for (unit in units) {
+            if (unit.getType() == unitType) {
+                return buy(gameMap, hero, unit)
+            }
         }
+
+        return false
+    }
+
+    private fun buy(gameMap: GameMap, hero: Hero, unit: Unit): Boolean {
+        val price = unit.getPrice()
+        return if (hero.money >= price) {
+            if (hero is Computer) {
+                computer.money -= price
+            } else {
+                playersMoney -= price
+            }
+            unit.place(gameMap)
+            hero.addUnit(unit)
+            true
+        } else false
     }
 
     suspend fun startRaccoonTimer() {
         while (true) {
-            // Случайное время появления енота (от 0 до 60 секунд)
             val randomTime = Random.nextLong(0, 60000)
             Log.w("Raccoon", "Raccoon is coming in ${randomTime / 1000} seconds!")
             delay(randomTime)
@@ -208,23 +275,26 @@ class GameMapViewModel: ViewModel() {
                 showRaccoon.value = true
                 Log.i("Raccoon", "Raccoon has appeared!")
 
-                // Случайное количество воскрешений (от 1 до количества умерших)
                 val resurrectCount = gameMap.getDeathNoteSize()
                 repeat(resurrectCount) {
                     gameMap.resurrect()
-                    Log.i("Raccoon", "Raccoon resurrected a character. Total resurrected: ${it + 1}")
+                    Log.i(
+                        "Raccoon",
+                        "Raccoon resurrected a character. Total resurrected: ${it + 1}"
+                    )
                 }
 
-                // Исчезновение енота через 7 секунд
-                delay(7000)
+                delay(7000) // исчезновение енота через 7 секунд
                 showRaccoon.value = false
-                Log.i("Raccoon", "Raccoon has disappeared after resurrecting $resurrectCount characters.")
+                Log.i(
+                    "Raccoon",
+                    "Raccoon has disappeared after resurrecting $resurrectCount characters."
+                )
             } else {
                 Log.e("Raccoon", "Nobody died. Nobody to resurrect.")
             }
 
-            // Задержка перед следующим появлением енота (60 секунд)
-            delay(60000)
+            delay(60000) // задержка перед следующим появлением енота 60 секунд
         }
     }
 }

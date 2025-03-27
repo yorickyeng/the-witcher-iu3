@@ -1,13 +1,14 @@
 package com.fk.thewitcheriu3.ui.game_map
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,31 +24,30 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fk.thewitcheriu3.R
 import com.fk.thewitcheriu3.domain.RaccoonComing
-import com.fk.thewitcheriu3.ui.GameOverScreen
+import com.fk.thewitcheriu3.ui.templates.CellView
 
 @Composable
-fun GameMapScreen() {
-
-    val viewModel: GameMapViewModel = viewModel()
-
+fun GameMapScreen(
+    viewModel: GameMapViewModel = viewModel()
+) {
     val gameMap = viewModel.gameMap
-    val player = viewModel.player
     val selectedCell = viewModel.selectedCell
     val cellsInMoveRange = viewModel.cellsInMoveRange
     val cellsInAttackRange = viewModel.cellsInAttackRange
     val showBuyMenu = viewModel.showBuyMenu
     val gameOver = viewModel.gameOver
     val showRaccoon = viewModel.showRaccoon
+    val playersMoney = viewModel.playersMoney
+    val movesCounter = viewModel.movesCounter
+    val movePoints = gameMap.getPlayer().units.size + 1 - movesCounter.intValue
+
+    val systemBarPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
     LaunchedEffect(Unit) {
         viewModel.startRaccoonTimer()
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.inverseSurface)
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(R.drawable.game_background),
             contentDescription = "Game Background",
@@ -59,7 +59,7 @@ fun GameMapScreen() {
             columns = GridCells.Fixed(gameMap.width),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(vertical = 22.dp)
+                .padding(vertical = systemBarPadding)
         ) {
             items(gameMap.height * gameMap.width) { index ->
                 val x = index % gameMap.width
@@ -80,7 +80,7 @@ fun GameMapScreen() {
 
         if (showBuyMenu.value) {
             BuyMenuScreen(
-                onBuy = { viewModel.handleBuyUnit(it) },
+                onBuy = { viewModel.playerBuysUnit(it) },
                 onClose = { showBuyMenu.value = false }
             )
         }
@@ -101,8 +101,21 @@ fun GameMapScreen() {
             )
         }
 
+        if (!showBuyMenu.value && !showRaccoon.value && gameOver.value == null) {
+            Text(
+                text = "Move points left: ${movePoints}\n",
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(top = systemBarPadding),
+                fontSize = 20.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Serif
+            )
+        }
+
         Text(
-            text = "Your money: ${player.money} orens",
+            text = "Your money: $playersMoney orens",
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),

@@ -15,14 +15,8 @@ abstract class Hero protected constructor(
     override val attackRange = 2
     abstract override val texture: Int
 
-    private var _money: Int = 200
-    var money: Int
-        set(value) {
-            _money = value
-        }
-        get() = _money
-
-    val units: MutableList<Unit> = mutableListOf()
+    var money: Int = 200
+    internal val units: MutableList<Unit> = mutableListOf()
 
     init {
         place(gameMap)
@@ -50,15 +44,6 @@ abstract class Hero protected constructor(
         yCoord = y
     }
 
-    fun buy(gameMap: GameMap, unit: Unit): Boolean {
-        val price = unit.getPrice()
-        return if (money >= price) {
-            money -= price
-            unit.place(gameMap)
-            addUnit(unit)
-            true
-        } else false
-    }
 
     override fun toString() =
         "$name\nHealth $health\n" + "Damage $damage\nMove Range $moveRange\n" +
