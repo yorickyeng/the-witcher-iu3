@@ -9,30 +9,57 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.room.Room
+import com.fk.thewitcheriu3.data.AppDatabase
+import com.fk.thewitcheriu3.data.GameMapRepository
+import com.fk.thewitcheriu3.data.GameMapRepositoryImpl
 import com.fk.thewitcheriu3.domain.PlayBackgroundMusic
-import com.fk.thewitcheriu3.domain.entities.NavRoutes
-import com.fk.thewitcheriu3.ui.MainMenu
-import com.fk.thewitcheriu3.ui.SettingsScreen
-import com.fk.thewitcheriu3.ui.game_map.GameMapCreatorScreen
-import com.fk.thewitcheriu3.ui.game_map.GameMapScreen
+import com.fk.thewitcheriu3.domain.models.NavRoutes
+import com.fk.thewitcheriu3.ui.screens.MainMenu
+import com.fk.thewitcheriu3.ui.screens.SettingsScreen
+import com.fk.thewitcheriu3.ui.screens.GameMapCreatorScreen
+import com.fk.thewitcheriu3.ui.screens.GameMapScreen
 import com.fk.thewitcheriu3.ui.theme.TheWitcherIU3Theme
 
+val LocalGameSavesRepository = staticCompositionLocalOf<GameMapRepository> {
+    error("GameMapRepository not provided!")
+}
+
 class MainActivity : ComponentActivity() {
+    private lateinit var repository: GameMapRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val appDatabase by lazy {
+            Room.databaseBuilder(
+                context = applicationContext,
+                klass = AppDatabase::class.java,
+                name = "game-database"
+            ).build()
+        }
+
+        val gameRepository by lazy {
+            GameMapRepositoryImpl(appDatabase.gameDao())
+        }
+
         enableEdgeToEdge()
         setContent {
-            TheWitcherIU3Theme {
-                Surface(color = MaterialTheme.colorScheme.background) {
-                    App()
+            CompositionLocalProvider(LocalGameSavesRepository provides gameRepository) {
+                TheWitcherIU3Theme {
+                    Surface(color = MaterialTheme.colorScheme.background) {
+                        App()
+                    }
                 }
             }
         }

@@ -1,10 +1,10 @@
 package com.fk.thewitcheriu3
 
-import com.fk.thewitcheriu3.domain.entities.Cell
-import com.fk.thewitcheriu3.domain.entities.GameMap
-import com.fk.thewitcheriu3.domain.entities.characters.units.witchers.CatSchoolWitcher
+import com.fk.thewitcheriu3.domain.models.Cell
+import com.fk.thewitcheriu3.domain.models.GameMap
+import com.fk.thewitcheriu3.domain.models.characters.units.witchers.CatSchoolWitcher
 import com.fk.thewitcheriu3.domain.penalty
-import com.fk.thewitcheriu3.ui.game_map.GameMapViewModel
+import com.fk.thewitcheriu3.ui.viewmodels.GameMapViewModel
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Test
