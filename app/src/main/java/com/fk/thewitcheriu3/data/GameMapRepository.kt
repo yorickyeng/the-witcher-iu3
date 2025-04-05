@@ -7,4 +7,5 @@ interface GameMapRepository {
     suspend fun loadGame(id: Int): GameMap?
     suspend fun getAllSaves(): List<Pair<Int, String>>
     suspend fun deleteSave(id: Int)
+    suspend fun deleteAllSaves()
 }

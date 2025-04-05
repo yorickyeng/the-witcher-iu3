@@ -21,5 +21,8 @@ data class GameMapEntity(
     var saveName: String = "",
 
     @ColumnInfo(name = "timestamp")
-    var timestamp: Long = System.currentTimeMillis()
+    var timestamp: Long = System.currentTimeMillis(),
+
+    @ColumnInfo(name = "movesCounter")
+    var movesCounter: Int = 0
 )

@@ -7,8 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fk.thewitcheriu3.LocalGameSavesRepository
-import com.fk.thewitcheriu3.MyApp
 import com.fk.thewitcheriu3.data.GameMapRepository
 import com.fk.thewitcheriu3.domain.models.Cell
 import com.fk.thewitcheriu3.domain.models.GameMap
@@ -43,9 +41,6 @@ class GameMapViewModel(
     private var computer by mutableStateOf(gameMap.getComputer())
     internal var selectedCharacter by mutableStateOf<Character?>(null)
 
-    var movesCounter = mutableIntStateOf(0)
-        private set
-
     var selectedCell = mutableStateOf<Pair<Int, Int>?>(null)
         private set
 
@@ -64,15 +59,11 @@ class GameMapViewModel(
     var gameOver = mutableStateOf<String?>(null)
         private set
 
+    var movesCounter = mutableIntStateOf(gameMap.movesCounter)
+        private set
+
     var playersMoney by mutableIntStateOf(player.money)
         private set
-
-    var showSaveLoad by mutableStateOf(false)
-        private set
-
-    fun changeSaveLoad() {
-        showSaveLoad = !showSaveLoad
-    }
 
     fun saveGame(saveName: String) {
         viewModelScope.launch {
@@ -91,6 +82,12 @@ class GameMapViewModel(
     fun getSavesList(): Flow<List<Pair<Int, String>>> {
         return flow {
             emit(repository.getAllSaves())
+        }
+    }
+
+    fun deleteAllSaves() {
+        viewModelScope.launch {
+            repository.deleteAllSaves()
         }
     }
 

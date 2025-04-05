@@ -22,27 +22,19 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.fk.thewitcheriu3.LocalGameSavesRepository
+import androidx.navigation.NavController
 import com.fk.thewitcheriu3.R
-import com.fk.thewitcheriu3.data.GameMapRepository
 import com.fk.thewitcheriu3.domain.RaccoonComing
+import com.fk.thewitcheriu3.domain.models.NavRoutes
 import com.fk.thewitcheriu3.ui.components.CellView
 import com.fk.thewitcheriu3.ui.viewmodels.GameMapViewModel
 
 @Composable
-fun GameMapScreen() {
-
-    val repository: GameMapRepository = LocalGameSavesRepository.current
-    val viewModel: GameMapViewModel = viewModel(
-        factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return GameMapViewModel(repository) as T
-            }
-        }
-    )
+fun GameMapScreen(
+    navController: NavController,
+    viewModel: GameMapViewModel = viewModel()
+) {
 
     val gameMap = viewModel.gameMap
     val selectedCell = viewModel.selectedCell
@@ -53,7 +45,6 @@ fun GameMapScreen() {
     val showRaccoon = viewModel.showRaccoon
     val playersMoney = viewModel.playersMoney
     val movesCounter = viewModel.movesCounter
-    val showSaveLoad = viewModel.showSaveLoad
     val movePoints = gameMap.getPlayer().units.size + 1 - movesCounter.intValue
 
     val systemBarPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -81,7 +72,8 @@ fun GameMapScreen() {
                 val y = index / gameMap.width
                 val cell = gameMap.map[y][x]
 
-                CellView(cell = cell,
+                CellView(
+                    cell = cell,
                     selectedCell = selectedCell.value,
                     cellsInMoveRange = cellsInMoveRange.value,
                     cellsInAttackRange = cellsInAttackRange.value,
@@ -117,17 +109,10 @@ fun GameMapScreen() {
         }
 
         Button(
-            onClick = { viewModel.changeSaveLoad() },
+            onClick = { navController.navigate(NavRoutes.SaveLoadMenu.route) },
             modifier = Modifier.align(Alignment.CenterStart)
         ) {
-            Text("Сохранить/Загрузить")
-        }
-
-        if (showSaveLoad) {
-            SaveLoadScreen(
-                viewModel = viewModel,
-                onClose = { viewModel.changeSaveLoad() }
-            )
+            Text("Save")
         }
 
         if (!showBuyMenu.value && !showRaccoon.value && gameOver.value == null) {

@@ -16,11 +16,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.fk.thewitcheriu3.data.AppDatabase
+import com.fk.thewitcheriu3.data.AppDatabase.Companion.MIGRATION_1_2
 import com.fk.thewitcheriu3.data.GameMapRepository
 import com.fk.thewitcheriu3.data.GameMapRepositoryImpl
 import com.fk.thewitcheriu3.domain.PlayBackgroundMusic
@@ -29,15 +33,15 @@ import com.fk.thewitcheriu3.ui.screens.MainMenu
 import com.fk.thewitcheriu3.ui.screens.SettingsScreen
 import com.fk.thewitcheriu3.ui.screens.GameMapCreatorScreen
 import com.fk.thewitcheriu3.ui.screens.GameMapScreen
+import com.fk.thewitcheriu3.ui.screens.SaveLoadScreen
 import com.fk.thewitcheriu3.ui.theme.TheWitcherIU3Theme
+import com.fk.thewitcheriu3.ui.viewmodels.GameMapViewModel
 
 val LocalGameSavesRepository = staticCompositionLocalOf<GameMapRepository> {
     error("GameMapRepository not provided!")
 }
 
 class MainActivity : ComponentActivity() {
-    private lateinit var repository: GameMapRepository
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -46,7 +50,7 @@ class MainActivity : ComponentActivity() {
                 context = applicationContext,
                 klass = AppDatabase::class.java,
                 name = "game-database"
-            ).build()
+            ).addMigrations(MIGRATION_1_2).build()
         }
 
         val gameRepository by lazy {
@@ -76,17 +80,38 @@ fun App() {
         PlayBackgroundMusic(R.raw.kaer_morhen)
     }
 
+    val repository: GameMapRepository = LocalGameSavesRepository.current
+    val viewModel: GameMapViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return GameMapViewModel(repository) as T
+            }
+        }
+    )
+
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = NavRoutes.MainMenu.route) {
         composable(NavRoutes.MainMenu.route) {
             MainMenu(navController = navController)
         }
-        composable(NavRoutes.NewGame.route) { GameMapScreen() }
+        composable(NavRoutes.NewGame.route) {
+            GameMapScreen(
+                navController = navController,
+                viewModel = viewModel,
+            )
+        }
         composable(NavRoutes.MapCreator.route) { GameMapCreatorScreen(navController = navController) }
         composable(NavRoutes.Settings.route) {
-            SettingsScreen(navController = navController,
+            SettingsScreen(
+                navController = navController,
                 onChangeMusicClicked = { playPhonk = !playPhonk },
                 onStopMusicClicked = { music.stop() })
+        }
+        composable(NavRoutes.SaveLoadMenu.route) {
+            SaveLoadScreen(
+                navController = navController,
+                viewModel = viewModel,
+            )
         }
     }
 
@@ -96,5 +121,7 @@ fun App() {
 @Preview(showSystemUi = true)
 @Composable
 fun GameScreenPreview() {
-    GameMapScreen()
+    GameMapScreen(
+        navController = TODO()
+    )
 }

@@ -15,12 +15,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.fk.thewitcheriu3.domain.models.NavRoutes
 import com.fk.thewitcheriu3.ui.viewmodels.GameMapViewModel
 
 @Composable
 fun SaveLoadScreen(
-    viewModel: GameMapViewModel,
-    onClose: () -> Unit
+    navController: NavController,
+    viewModel: GameMapViewModel = viewModel()
 ) {
     val saves by viewModel.getSavesList().collectAsState(emptyList())
 
@@ -31,9 +34,10 @@ fun SaveLoadScreen(
                     Text(name)
                     Button(onClick = {
                         viewModel.loadGame(id)
-                        onClose()
+                        navController.navigate(NavRoutes.NewGame.route)
+                        viewModel.loadGame(id)
                     }) {
-                        Text("Загрузить")
+                        Text("Load")
                     }
                 }
             }
@@ -47,10 +51,16 @@ fun SaveLoadScreen(
         Button(
             onClick = {
                 viewModel.saveGame(saveName)
-                onClose()
             }
         ) {
-            Text("Сохранить")
+            Text("Save")
+        }
+        Button(
+            onClick = {
+                viewModel.deleteAllSaves()
+            }
+        ) {
+            Text("Delete All Saves")
         }
     }
 }

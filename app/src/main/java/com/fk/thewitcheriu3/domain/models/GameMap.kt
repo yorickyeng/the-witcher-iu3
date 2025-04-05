@@ -24,13 +24,11 @@ class GameMap(
         }
     }
 
-//    private lateinit var player: Player
-//    private lateinit var computer: Computer
-
     private var player = Player(name = "Cirilla Fiona Elen Riannon", 0, 1, this)
-    private var computer = Computer(name = "computer of Roggeveen", 9, 8, this)
+    private var computer = Computer(name = "Vilgefortz of Roggeveen", 9, 8, this)
 
     internal var units: List<Unit> = player.units + computer.units
+    internal var movesCounter = player.units.size + 1
 
     private var deathNote = mutableListOf<Character>()
 
@@ -202,9 +200,6 @@ class GameMap(
     }
 
     private fun initCharacters() {
-//        player = Player(name = "Cirilla Fiona Elen Riannon", 0, 1, this)
-//        computer = Computer(name = "computer of Roggeveen", 9, 8, this)
-
         val catSchoolWitcher = CatSchoolWitcher()
         catSchoolWitcher.place(this)
         player.addUnit(catSchoolWitcher)

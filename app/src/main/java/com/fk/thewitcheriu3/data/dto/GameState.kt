@@ -7,7 +7,8 @@ data class GameState(
     val map: Array<Array<CellState>>,
     val player: HeroState,
     val computer: HeroState,
-    val units: List<UnitState>
+    val units: List<UnitState>,
+    val movesCounter: Int = 0,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -19,6 +20,7 @@ data class GameState(
         if (player != other.player) return false
         if (computer != other.computer) return false
         if (units != other.units) return false
+        if (movesCounter != other.movesCounter) return false
 
         return true
     }
@@ -28,6 +30,7 @@ data class GameState(
         result = 31 * result + player.hashCode()
         result = 31 * result + computer.hashCode()
         result = 31 * result + units.hashCode()
+        result = 31 * result + movesCounter
         return result
     }
 }

@@ -23,14 +23,17 @@ class GameMapRepositoryImpl(private val gameDao: GameDao) : GameMapRepository {
         val gameState = convertToGameState(gameMap)
         val entity = GameMapEntity(
             gameState = gameState,
-            saveName = saveName
+            saveName = saveName,
+            movesCounter = gameMap.movesCounter
         )
         gameDao.insert(entity)
     }
 
     override suspend fun loadGame(id: Int): GameMap? {
         val entity = gameDao.getSaveById(id) ?: return null
-        return convertFromGameState(entity.gameState)
+        val gameMap = convertFromGameState(entity.gameState)
+        gameMap.movesCounter = entity.movesCounter
+        return gameMap
     }
 
     override suspend fun getAllSaves(): List<Pair<Int, String>> {
@@ -39,6 +42,10 @@ class GameMapRepositoryImpl(private val gameDao: GameDao) : GameMapRepository {
 
     override suspend fun deleteSave(id: Int) {
         gameDao.deleteSave(id)
+    }
+
+    override suspend fun deleteAllSaves() {
+        gameDao.deleteAllSaves()
     }
 
     private fun convertToGameState(gameMap: GameMap): GameState {
@@ -56,42 +63,43 @@ class GameMapRepositoryImpl(private val gameDao: GameDao) : GameMapRepository {
 
         val player = convertToHeroState(gameMap.getPlayer())
         val computer = convertToHeroState(gameMap.getComputer())
-        val units = gameMap.units.map { convertToUnitState(it) }
+        val units = (gameMap.getPlayer().units + gameMap.getComputer().units).map { convertToUnitState(it) }
+        val movesCounter = gameMap.movesCounter
 
         return GameState(
             map = cells,
             player = player,
             computer = computer,
-            units = units
+            units = units,
+            movesCounter = movesCounter,
         )
     }
 
     private fun convertFromGameState(gameState: GameState): GameMap {
-        val gameMap = GameMap(width = gameState.map.size, height = gameState.map[0].size)
+        val gameMap = GameMap(width = gameState.map.size, height = gameState.map[0].size).apply {
 
-        gameState.units.forEach { unitState ->
-            val unit = convertFromUnitState(unitState)
-            when (unit) {
-                is Witcher -> gameMap.getPlayer().units.add(unit)
-                is Monster -> gameMap.getComputer().units.add(unit)
+            setPlayer(convertFromHeroState(gameState.player, this) as Player)
+            setComputer(convertFromHeroState(gameState.computer, this) as Computer)
+
+            gameState.map.forEachIndexed { y, row ->
+                row.forEachIndexed { x, cellState ->
+                    map[y][x] = Cell(
+                        xCoord = x,
+                        yCoord = y,
+                        type = cellState.type,
+                        hero = cellState.hero?.let { convertFromHeroState(it, this) },
+                        unit = cellState.unit?.let { convertFromUnitState(it).apply {
+                            when (this) {
+                                is Witcher -> getPlayer().units.add(this)
+                                is Monster -> getComputer().units.add(this)
+                            }
+                        }}
+                    )
+                }
             }
+
+            movesCounter = gameState.movesCounter
         }
-
-        gameState.map.forEachIndexed { y, row ->
-            row.forEachIndexed { x, cellState ->
-                val cell = Cell(
-                    xCoord = x,
-                    yCoord = y,
-                    type = cellState.type
-                )
-                gameMap.map[y][x] = cell
-            }
-        }
-
-        gameMap.setPlayer(convertFromHeroState(gameState.player, gameMap) as Player)
-        gameMap.setComputer(convertFromHeroState(gameState.computer, gameMap) as Computer)
-
-        gameMap.units = gameState.units.map { convertFromUnitState(it) }
 
         return gameMap
     }
@@ -146,37 +154,21 @@ class GameMapRepositoryImpl(private val gameDao: GameDao) : GameMapRepository {
 
     private fun convertFromUnitState(unitState: UnitState): Unit {
         return when (unitState.type) {
-            "WolfSchoolWitcher" -> WolfSchoolWitcher().apply {
-                xCoord = unitState.xCoord
-                yCoord = unitState.yCoord
-                health = unitState.health
-            }
-            "CatSchoolWitcher" -> CatSchoolWitcher().apply {
-                xCoord = unitState.xCoord
-                yCoord = unitState.yCoord
-                health = unitState.health
-            }
-            "GWENTWitcher" -> GWENTWitcher().apply {
-                xCoord = unitState.xCoord
-                yCoord = unitState.yCoord
-                health = unitState.health
-            }
-            "BearSchoolWitcher" -> BearSchoolWitcher().apply {
-                xCoord = unitState.xCoord
-                yCoord = unitState.yCoord
-                health = unitState.health
-            }
-            "Drowner" -> Drowner().apply {
-                xCoord = unitState.xCoord
-                yCoord = unitState.yCoord
-                health = unitState.health
-            }
-            "Bruxa" -> Bruxa().apply {
-                xCoord = unitState.xCoord
-                yCoord = unitState.yCoord
-                health = unitState.health
-            }
+            "WolfSchoolWitcher" -> unitState.applyToUnit(WolfSchoolWitcher())
+            "CatSchoolWitcher" -> unitState.applyToUnit(CatSchoolWitcher())
+            "GWENTWitcher" -> unitState.applyToUnit(GWENTWitcher())
+            "BearSchoolWitcher" -> unitState.applyToUnit(BearSchoolWitcher())
+            "Drowner" -> unitState.applyToUnit(Drowner())
+            "Bruxa" -> unitState.applyToUnit(Bruxa())
             else -> throw IllegalArgumentException("Unknown unit type: ${unitState.type}")
+        }
+    }
+
+    private fun UnitState.applyToUnit(unit: Unit): Unit {
+        return unit.apply {
+            xCoord = this@applyToUnit.xCoord
+            yCoord = this@applyToUnit.yCoord
+            health = this@applyToUnit.health
         }
     }
 }
