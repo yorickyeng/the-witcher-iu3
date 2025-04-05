@@ -1,7 +1,9 @@
 package com.fk.thewitcheriu3.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,12 +29,12 @@ import com.fk.thewitcheriu3.R
 import com.fk.thewitcheriu3.domain.RaccoonComing
 import com.fk.thewitcheriu3.domain.models.NavRoutes
 import com.fk.thewitcheriu3.ui.components.CellView
+import com.fk.thewitcheriu3.ui.components.MainMenuButton
 import com.fk.thewitcheriu3.ui.viewmodels.GameMapViewModel
 
 @Composable
 fun GameMapScreen(
-    navController: NavController,
-    viewModel: GameMapViewModel = viewModel()
+    navController: NavController, viewModel: GameMapViewModel = viewModel()
 ) {
 
     val gameMap = viewModel.gameMap
@@ -45,6 +46,7 @@ fun GameMapScreen(
     val showRaccoon = viewModel.showRaccoon
     val playersMoney = viewModel.playersMoney
     val movesCounter = viewModel.movesCounter
+    val saveName = viewModel.saveName
     val movePoints = gameMap.getPlayer().units.size + 1 - movesCounter.intValue
 
     val systemBarPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -88,8 +90,7 @@ fun GameMapScreen(
         if (showBuyMenu.value) {
             BuyMenuScreen(
                 onBuy = { viewModel.playerBuysUnit(it) },
-                onClose = { showBuyMenu.value = false }
-            )
+                onClose = { showBuyMenu.value = false })
         }
 
         if (selectedCell.value != null) {
@@ -108,24 +109,30 @@ fun GameMapScreen(
             )
         }
 
-        Button(
-            onClick = { navController.navigate(NavRoutes.SaveLoadMenu.route) },
-            modifier = Modifier.align(Alignment.CenterStart)
-        ) {
-            Text("Save")
-        }
-
         if (!showBuyMenu.value && !showRaccoon.value && gameOver.value == null) {
-            Text(
-                text = "Move points left: ${movePoints}\n",
+            Row(
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(top = systemBarPadding),
-                fontSize = 20.sp,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Serif
-            )
+                    .fillMaxSize()
+                    .padding(
+                        top = systemBarPadding,
+                        start = 4.dp,
+                        end = 4.dp,
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                MainMenuButton("Save") { viewModel.saveGame(saveName) }
+
+                Text(
+                    text = "Move points left: ${movePoints}\n",
+                    fontSize = 20.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Serif
+                )
+
+                MainMenuButton("Load") { navController.navigate(NavRoutes.SaveLoadMenu.route) }
+            }
         }
 
         Text(

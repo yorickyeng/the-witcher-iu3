@@ -20,6 +20,9 @@ data class GameMapEntity(
     @ColumnInfo(name = "saveName")
     var saveName: String = "",
 
+    @ColumnInfo(name = "playerMoney")
+    var playerMoney: Int,
+
     @ColumnInfo(name = "timestamp")
     var timestamp: Long = System.currentTimeMillis(),
 

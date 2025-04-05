@@ -17,6 +17,8 @@ import com.fk.thewitcheriu3.domain.models.characters.units.witchers.BearSchoolWi
 import com.fk.thewitcheriu3.domain.models.characters.units.witchers.CatSchoolWitcher
 import com.fk.thewitcheriu3.domain.models.characters.units.witchers.GWENTWitcher
 import com.fk.thewitcheriu3.domain.models.characters.units.witchers.WolfSchoolWitcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class GameMapRepositoryImpl(private val gameDao: GameDao) : GameMapRepository {
     override suspend fun saveGame(gameMap: GameMap, saveName: String) {
@@ -24,6 +26,7 @@ class GameMapRepositoryImpl(private val gameDao: GameDao) : GameMapRepository {
         val entity = GameMapEntity(
             gameState = gameState,
             saveName = saveName,
+            playerMoney = gameMap.getPlayer().money,
             movesCounter = gameMap.movesCounter
         )
         gameDao.insert(entity)
@@ -32,7 +35,6 @@ class GameMapRepositoryImpl(private val gameDao: GameDao) : GameMapRepository {
     override suspend fun loadGame(id: Int): GameMap? {
         val entity = gameDao.getSaveById(id) ?: return null
         val gameMap = convertFromGameState(entity.gameState)
-        gameMap.movesCounter = entity.movesCounter
         return gameMap
     }
 
@@ -46,6 +48,16 @@ class GameMapRepositoryImpl(private val gameDao: GameDao) : GameMapRepository {
 
     override suspend fun deleteAllSaves() {
         gameDao.deleteAllSaves()
+    }
+
+    override fun getHighScores(): Flow<List<Pair<String, Int>>> = flow {
+        val saves = gameDao.getAllSaves()
+        val records = saves
+            .groupBy { it.saveName }
+            .mapValues { (_, saves) -> saves.maxOf { it.playerMoney } }
+            .toList()
+            .sortedByDescending { (_, money) -> money }
+        emit(records)
     }
 
     private fun convertToGameState(gameMap: GameMap): GameState {

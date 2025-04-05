@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlin.random.Random
+import kotlinx.serialization.json.Json
 
 class GameMapViewModel(
     private val repository: GameMapRepository
@@ -59,11 +60,16 @@ class GameMapViewModel(
     var gameOver = mutableStateOf<String?>(null)
         private set
 
+    var saveName by mutableStateOf("NoName")
+        internal set
+
     var movesCounter = mutableIntStateOf(gameMap.movesCounter)
         private set
 
     var playersMoney by mutableIntStateOf(player.money)
         private set
+
+    fun getHighScores(): Flow<List<Pair<String, Int>>> = repository.getHighScores()
 
     fun saveGame(saveName: String) {
         viewModelScope.launch {
@@ -79,9 +85,13 @@ class GameMapViewModel(
         }
     }
 
-    fun getSavesList(): Flow<List<Pair<Int, String>>> {
-        return flow {
-            emit(repository.getAllSaves())
+    fun getSavesList(): Flow<List<Pair<Int, String>>> = flow {
+        emit(repository.getAllSaves())
+    }
+
+    fun deleteSave(id: Int) {
+        viewModelScope.launch {
+            repository.deleteSave(id)
         }
     }
 
@@ -261,6 +271,7 @@ class GameMapViewModel(
             is Monster -> {
                 computer.units.remove(target)
                 playersMoney += target.getPrice()
+                player.money = playersMoney
             }
         }
     }

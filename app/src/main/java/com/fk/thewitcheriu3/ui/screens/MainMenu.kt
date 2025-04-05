@@ -44,6 +44,8 @@ fun MainMenu(navController: NavController) {
                 contentScale = ContentScale.Crop
             )
             MainMenuButton("New Game") { navController.navigate(NavRoutes.NewGame.route) }
+            MainMenuButton("Load Game") { navController.navigate(NavRoutes.SaveLoadMenu.route) }
+            MainMenuButton("Records") { navController.navigate(NavRoutes.Records.route) }
             MainMenuButton("Create Custom Map") { navController.navigate(NavRoutes.MapCreator.route) }
             MainMenuButton("Settings") { navController.navigate(NavRoutes.Settings.route) }
         }
