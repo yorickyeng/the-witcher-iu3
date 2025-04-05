@@ -36,6 +36,7 @@ import com.fk.thewitcheriu3.ui.screens.GameMapCreatorScreen
 import com.fk.thewitcheriu3.ui.screens.GameMapScreen
 import com.fk.thewitcheriu3.ui.screens.RecordsScreen
 import com.fk.thewitcheriu3.ui.screens.SaveLoadScreen
+import com.fk.thewitcheriu3.ui.screens.GwentGameScreen
 import com.fk.thewitcheriu3.ui.theme.TheWitcherIU3Theme
 import com.fk.thewitcheriu3.ui.viewmodels.GameMapViewModel
 
@@ -83,7 +84,7 @@ fun App() {
     }
 
     val repository: GameMapRepository = LocalGameSavesRepository.current
-    val viewModel: GameMapViewModel = viewModel(
+    val gameMapViewModel: GameMapViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return GameMapViewModel(repository) as T
@@ -99,7 +100,7 @@ fun App() {
         composable(NavRoutes.NewGame.route) {
             GameMapScreen(
                 navController = navController,
-                viewModel = viewModel,
+                viewModel = gameMapViewModel,
             )
         }
         composable(NavRoutes.MapCreator.route) { GameMapCreatorScreen(navController = navController) }
@@ -112,13 +113,19 @@ fun App() {
         composable(NavRoutes.SaveLoadMenu.route) {
             SaveLoadScreen(
                 navController = navController,
-                viewModel = viewModel,
+                viewModel = gameMapViewModel,
             )
         }
         composable(NavRoutes.Records.route) {
             RecordsScreen(
                 navController = navController,
-                viewModel = viewModel,
+                viewModel = gameMapViewModel,
+            )
+        }
+        composable(NavRoutes.Gwent.route) {
+            GwentGameScreen(
+                navController = navController,
+                viewModel = viewModel()
             )
         }
     }

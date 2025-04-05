@@ -48,6 +48,7 @@ fun MainMenu(navController: NavController) {
             MainMenuButton("Records") { navController.navigate(NavRoutes.Records.route) }
             MainMenuButton("Create Custom Map") { navController.navigate(NavRoutes.MapCreator.route) }
             MainMenuButton("Settings") { navController.navigate(NavRoutes.Settings.route) }
+            MainMenuButton("Gwent") { navController.navigate(NavRoutes.Gwent.route) }
         }
     }
 }

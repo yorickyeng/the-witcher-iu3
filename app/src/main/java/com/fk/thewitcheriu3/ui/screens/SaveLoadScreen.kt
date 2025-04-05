@@ -190,7 +190,7 @@ fun SaveItem(
                     Text("Load")
                 }
 
-                Button(
+        Button(
                     onClick = onDeleteClick,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Red
