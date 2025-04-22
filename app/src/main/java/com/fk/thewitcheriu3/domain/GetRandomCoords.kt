@@ -1,6 +1,6 @@
 package com.fk.thewitcheriu3.domain
 
-import com.fk.thewitcheriu3.domain.entities.GameMap
+import com.fk.thewitcheriu3.domain.models.GameMap
 import kotlin.random.Random
 
 fun getRandomCoords(
