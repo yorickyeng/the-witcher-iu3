@@ -7,7 +7,7 @@ enum class GwentCardRow {
     MELEE,
     RANGED,
     SIEGE,
-    WEATHER
+    WEATHER,
 }
 
 data class GwentCard(
@@ -18,11 +18,11 @@ data class GwentCard(
     @DrawableRes val imageRes: Int,
     val description: String = "",
     val isHero: Boolean = false,
-    val weatherEffect: WeatherEffect? = null
+    val weatherEffect: WeatherEffect? = null,
 )
 
 enum class WeatherEffect {
-    FROST,  // Обнуляет силу карт ближнего боя
-    FOG,    // Обнуляет силу карт дальнего боя
-    RAIN    // Обнуляет силу осадных орудий
+    FROST,
+    FOG,
+    RAIN,
 } 

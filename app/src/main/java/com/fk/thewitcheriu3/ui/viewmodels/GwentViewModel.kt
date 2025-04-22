@@ -1,5 +1,6 @@
 package com.fk.thewitcheriu3.ui.viewmodels
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -7,29 +8,27 @@ import androidx.lifecycle.ViewModel
 import com.fk.thewitcheriu3.R
 import com.fk.thewitcheriu3.domain.models.gwent.*
 
+@Stable
 class GwentViewModel : ViewModel() {
     var gameState by mutableStateOf<GwentGameState?>(null)
-        private set
 
-    // Добавим состояние для отображения диалога
     var showRoundResult by mutableStateOf(false)
         private set
 
     private val defaultDeck = listOf(
-        // Используем существующие изображения как заглушки
-        GwentCard(1, "Geralt", 15, GwentCardRow.MELEE, R.drawable.geralt, isHero = true),
-        GwentCard(2, "Ciri", 15, GwentCardRow.MELEE, R.drawable.ciri, isHero = true),
-        GwentCard(3, "Gaetan", 6, GwentCardRow.MELEE, R.drawable.gaetan),
-        GwentCard(4, "Bear Witcher", 5, GwentCardRow.MELEE, R.drawable.bear),
-        GwentCard(5, "Vilgefortz", 5, GwentCardRow.RANGED, R.drawable.vilgefortz),
-        GwentCard(6, "Bruxa", 5, GwentCardRow.MELEE, R.drawable.bruxa),
-        GwentCard(7, "Drowner", 7, GwentCardRow.RANGED, R.drawable.drowner),
-        GwentCard(8, "Stygga", 7, GwentCardRow.SIEGE, R.drawable.stygga),
-        GwentCard(9, "Kaer Morhen", 6, GwentCardRow.SIEGE, R.drawable.kaer_morhen),
-        GwentCard(10, "Forest", 8, GwentCardRow.SIEGE, R.drawable.forest),
+        GwentCard(1, "Geralt", 15, GwentCardRow.MELEE, R.drawable.gwent_card_geralt, isHero = true),
+        GwentCard(2, "Vernon Roche", 10, GwentCardRow.MELEE, R.drawable.gwent_card_vernon_roche, isHero = true),
+        GwentCard(3, "Siegfried Of Denesle", 5, GwentCardRow.MELEE, R.drawable.gwent_card_siegfried_of_denesle),
+        GwentCard(4, "Yarpen Zigrin", 2, GwentCardRow.MELEE, R.drawable.gwent_card_yarpen_zigrin),
+        GwentCard(5, "Sabrina Glevissig", 4, GwentCardRow.RANGED, R.drawable.gwent_card_sabrina_glevissig),
+        GwentCard(6, "Dethmold", 6, GwentCardRow.RANGED, R.drawable.gwent_card_dethmold),
+        GwentCard(7, "Keira Metz", 5, GwentCardRow.RANGED, R.drawable.gwent_card_keira_metz),
+        GwentCard(8, "Ballista", 6, GwentCardRow.SIEGE, R.drawable.gwent_card_ballista),
+        GwentCard(9, "Kaedweni Siege Expert", 1, GwentCardRow.SIEGE, R.drawable.gwent_card_kaedweni_siege_expert),
+        GwentCard(10, "Catapult", 8, GwentCardRow.SIEGE, R.drawable.gwent_card_catapult),
         GwentCard(11, "Frost", 0, GwentCardRow.WEATHER, R.drawable.weather_frost, weatherEffect = WeatherEffect.FROST),
         GwentCard(12, "Fog", 0, GwentCardRow.WEATHER, R.drawable.weather_fog, weatherEffect = WeatherEffect.FOG),
-        GwentCard(13, "Rain", 0, GwentCardRow.WEATHER, R.drawable.weather_rain, weatherEffect = WeatherEffect.RAIN)
+        GwentCard(13, "Rain", 0, GwentCardRow.WEATHER, R.drawable.weather_rain, weatherEffect = WeatherEffect.RAIN),
     )
 
     init {
@@ -38,7 +37,6 @@ class GwentViewModel : ViewModel() {
 
     fun startNewGame() {
         val shuffledDeck = defaultDeck.shuffled()
-        // Теперь даем по 5 карт вместо 10
         val playerHand = shuffledDeck.take(10)
         val aiHand = shuffledDeck.drop(10).take(10)
 
@@ -52,7 +50,6 @@ class GwentViewModel : ViewModel() {
     }
 
     private fun checkRoundEnd(state: GwentGameState): GwentGameState {
-        // Если оба игрока спасовали или у обоих кончились карты, завершаем раунд
         if ((state.playerPassed && state.aiPassed) || 
             (state.playerHand.isEmpty() && state.aiHand.isEmpty())) {
             return finishRound(state)
@@ -63,28 +60,25 @@ class GwentViewModel : ViewModel() {
     private fun finishRound(state: GwentGameState): GwentGameState {
         val playerScore = calculateScore(state.playerField, state.weatherEffects)
         val aiScore = calculateScore(state.aiField, state.weatherEffects)
-        
-        // Проверяем сценарий двойного паса в начале раунда
+
         if (state.playerPassed && state.aiPassed && 
             state.playerField.all { it.value.isEmpty() } && 
             state.aiField.all { it.value.isEmpty() }) {
-            return startNewRound(state) // Переигрываем раунд
+            return startNewRound(state)
         }
 
-        // Проверяем ничью
         if (playerScore == aiScore) {
-            return startNewRound(state) // Переигрываем раунд при ничьей
+            return startNewRound(state)
         }
 
         val (newPlayerRoundsWon, newAiRoundsWon) = when {
             playerScore > aiScore -> Pair(state.playerRoundsWon + 1, state.aiRoundsWon)
             aiScore > playerScore -> Pair(state.playerRoundsWon, state.aiRoundsWon + 1)
-            else -> Pair(state.playerRoundsWon, state.aiRoundsWon) // При ничьей никто не получает очко
+            else -> Pair(state.playerRoundsWon, state.aiRoundsWon)
         }
 
         showRoundResult = true
 
-        // Проверяем победу в игре
         if (newPlayerRoundsWon >= 2 || newAiRoundsWon >= 2) {
             return state.copy(
                 playerRoundsWon = newPlayerRoundsWon,
@@ -132,13 +126,10 @@ class GwentViewModel : ViewModel() {
             else -> playNormalCard(card, currentState)
         }
 
-        // Проверяем окончание раунда после хода игрока
         var updatedState = checkRoundEnd(newState)
-        
-        // Если раунд не закончился и AI не спасовал, делаем ход AI
+
         if (!updatedState.isGameOver && !updatedState.aiPassed && updatedState == newState) {
             updatedState = makeAiMove(updatedState)
-            // Проверяем окончание раунда после хода AI
             updatedState = checkRoundEnd(updatedState)
         }
 
@@ -205,19 +196,16 @@ class GwentViewModel : ViewModel() {
         val scoreDiff = playerScore - aiScore
 
         return when {
-            // Если нужно догнать игрока, играем сильнейшую карту
             scoreDiff > 0 -> state.aiHand.maxByOrNull { it.power }
             
-            // Если у нас преимущество, играем слабейшую карту
             scoreDiff < -10 -> state.aiHand.minByOrNull { it.power }
-            
-            // В остальных случаях играем карту средней силы
+
             else -> state.aiHand.sortedBy { it.power }
                 .getOrNull(state.aiHand.size / 2)
         }
     }
 
-    private fun calculateScore(field: Map<GwentCardRow, List<GwentCard>>, weatherEffects: List<WeatherEffect>): Int {
+    internal fun calculateScore(field: Map<GwentCardRow, List<GwentCard>>, weatherEffects: List<WeatherEffect>): Int {
         return field.entries.sumOf { (row, cards) ->
             when {
                 row == GwentCardRow.MELEE && WeatherEffect.FROST in weatherEffects -> 0
@@ -260,11 +248,9 @@ class GwentViewModel : ViewModel() {
             isPlayerTurn = false
         )
 
-        // Если AI уже спасовал, сразу завершаем раунд
         if (newState.aiPassed) {
             newState = checkRoundEnd(newState)
         } else {
-            // Иначе даем AI сделать ход
             newState = makeAiMove(newState)
             newState = checkRoundEnd(newState)
         }
@@ -272,7 +258,7 @@ class GwentViewModel : ViewModel() {
         gameState = newState
     }
 
-    private fun shouldAiPass(state: GwentGameState, playerScore: Int, aiScore: Int): Boolean {
+    internal fun shouldAiPass(state: GwentGameState, playerScore: Int, aiScore: Int): Boolean {
         return when {
             // Если игрок спасовал и у AI больше очков - пасуем
             state.playerPassed && aiScore > playerScore -> true
@@ -290,7 +276,6 @@ class GwentViewModel : ViewModel() {
         }
     }
 
-    // Добавим функцию для продолжения игры
     fun continueGame() {
         showRoundResult = false
     }

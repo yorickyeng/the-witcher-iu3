@@ -89,6 +89,7 @@ fun GameMapScreen(
 
         if (showBuyMenu.value) {
             BuyMenuScreen(
+                onPlayGwent = { navController.navigate(NavRoutes.Gwent.route) },
                 onBuy = { viewModel.playerBuysUnit(it) },
                 onClose = { showBuyMenu.value = false })
         }

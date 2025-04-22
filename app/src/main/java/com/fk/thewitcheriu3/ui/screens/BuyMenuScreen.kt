@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,6 +27,7 @@ import com.fk.thewitcheriu3.domain.models.characters.units.witchers.WolfSchoolWi
 
 @Composable
 fun BuyMenuScreen(
+    onPlayGwent: () -> Unit,
     onBuy: (String) -> Unit,
     onClose: () -> Unit
 ) {
@@ -44,17 +46,23 @@ fun BuyMenuScreen(
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
-                .background(MaterialTheme.colorScheme.background, shape = CircleShape)
-                .border(border = BorderStroke(3.dp, Color.Black), shape = CircleShape)
+                .background(MaterialTheme.colorScheme.background, shape = RoundedCornerShape(40.dp))
+                .border(border = BorderStroke(3.dp, Color.Black), shape = RoundedCornerShape(40.dp))
                 .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Buy Unit",
+                text = "Kaer Morhen",
                 color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
+
+            Button(
+                onClick = onPlayGwent, modifier = Modifier.padding(8.dp)
+            ) {
+                Text("Play GWENT!")
+            }
 
             for (witcher in witchers) {
                 Button(
@@ -76,5 +84,8 @@ fun BuyMenuScreen(
 @Preview(showSystemUi = true)
 @Composable
 fun BuyUnitMenuPreview() {
-    BuyMenuScreen(onBuy = {}, onClose = {})
+    BuyMenuScreen(
+        onBuy = {}, onClose = {},
+        onPlayGwent = {}
+    )
 }

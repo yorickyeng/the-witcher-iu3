@@ -111,7 +111,6 @@ class GameMapViewModel(
             selectedCharacterMoveAndAttackLogic(selectedChar, targetCell = cell)
             changeTurn()
             resetSelected()
-
         } ?: run {
             // Если персонаж ещё не выбран
             // Здесь cell - 1я выбранная клетка (выбор союзника)
@@ -161,7 +160,7 @@ class GameMapViewModel(
         cellsInAttackRange.value = emptySet()
     }
 
-    internal fun selectedCharacterMoveAndAttackLogic(selectedChar: Character, targetCell: Cell) {
+    private fun selectedCharacterMoveAndAttackLogic(selectedChar: Character, targetCell: Cell) {
         val (selectedX, selectedY) = selectedChar.getPosition()
         val distance = measureDistance(
             fromX = selectedX,
@@ -186,7 +185,7 @@ class GameMapViewModel(
         }
     }
 
-    internal fun allyMoves(ally: Character, targetCell: Cell) {
+    private fun allyMoves(ally: Character, targetCell: Cell) {
         when (targetCell.type) {
             // Если это мой замок
             "Kaer Morhen" -> showBuyMenu.value = true

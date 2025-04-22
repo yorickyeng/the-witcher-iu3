@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -32,67 +33,54 @@ fun GwentGameScreen(
         Image(
             painter = painterResource(R.drawable.gwent_field),
             contentDescription = "Game Background",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
+            modifier = Modifier
+                .padding(bottom = 150.dp)
+                .fillMaxSize(),
+            contentScale = ContentScale.Crop,
         )
 
-        Row(modifier = Modifier.fillMaxSize()) {
-            // Перемещаем боковую панель влево
-            ScorePanel(
-                gameState = gameState,
-                modifier = Modifier
-                    .width(120.dp)
-                    .fillMaxHeight()
-                    .background(Color.Black.copy(alpha = 0.7f))
-                    .padding(8.dp)
-            )
-
-            // Основное поле игры
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Поле противника
-                AiField(
-                    field = gameState?.aiField ?: emptyMap(),
-                    weatherEffects = gameState?.weatherEffects ?: emptyList(),
-                    modifier = Modifier.weight(1f)
-                )
-
-                // Погодные эффекты
-                WeatherEffects(
-                    effects = gameState?.weatherEffects ?: emptyList(),
-                    modifier = Modifier.height(60.dp)
-                )
-
-                // Поле игрока
-                PlayerField(
-                    field = gameState?.playerField ?: emptyMap(),
-                    weatherEffects = gameState?.weatherEffects ?: emptyList(),
-                    modifier = Modifier.weight(1f)
-                )
-
-                // Рука игрока
-                PlayerHand(
-                    cards = gameState?.playerHand ?: emptyList(),
-                    onCardClick = { viewModel.playCard(it) },
-                    modifier = Modifier.height(150.dp)
-                )
-
-                Button(
-                    onClick = { viewModel.pass() },
+        Column(modifier = Modifier.fillMaxSize()) {
+            Row(modifier = Modifier.weight(1f)) {
+                ScorePanel(
+                    gameState = gameState,
+                    onPassClick = { viewModel.pass() },
                     modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(8.dp)
+                        .width(100.dp)
+                        .fillMaxHeight()
+                        .background(Color.Black.copy(alpha = 0.7f))
+                        .padding(8.dp),
+                )
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Pass")
+                    AiField(
+                        field = gameState?.aiField ?: emptyMap(),
+                        weatherEffects = gameState?.weatherEffects ?: emptyList(),
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    WeatherEffects(
+                        effects = gameState?.weatherEffects ?: emptyList(),
+                        modifier = Modifier.height(60.dp)
+                    )
+
+                    PlayerField(
+                        field = gameState?.playerField ?: emptyMap(),
+                        weatherEffects = gameState?.weatherEffects ?: emptyList(),
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
+
+            PlayerHand(
+                cards = gameState?.playerHand ?: emptyList(),
+                onCardClick = { viewModel.playCard(it) },
+                modifier = Modifier.height(150.dp),
+            )
         }
 
-        // Показываем результат раунда
         if (viewModel.showRoundResult && gameState?.roundWinner != null && !gameState.isGameOver) {
             RoundResultDialog(
                 winner = gameState.roundWinner,
@@ -105,7 +93,6 @@ fun GwentGameScreen(
             )
         }
 
-        // Показываем диалог окончания игры
         if (gameState?.isGameOver == true) {
             GameOverDialog(
                 playerRoundsWon = gameState.playerRoundsWon,
@@ -146,30 +133,14 @@ fun GwentCardView(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier
-            .width(100.dp)
-            .height(140.dp)
-            .clickable(onClick = onClick)
+        modifier = modifier.clickable(onClick = onClick)
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painterResource(card.imageRes),
-                contentDescription = card.name,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-
-            if (card.row != GwentCardRow.WEATHER) {
-                Text(
-                    text = card.power.toString(),
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .background(Color.Black.copy(alpha = 0.7f))
-                        .padding(4.dp),
-                    color = Color.White
-                )
-            }
-        }
+        Image(
+            painter = painterResource(card.imageRes),
+            contentDescription = card.name,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Fit
+        )
     }
 }
 
@@ -186,9 +157,9 @@ fun PlayerField(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         BattleRow(
-            cards = field[GwentCardRow.SIEGE] ?: emptyList(),
-            isAffectedByWeather = WeatherEffect.RAIN in weatherEffects,
-            rowType = GwentCardRow.SIEGE
+            cards = field[GwentCardRow.MELEE] ?: emptyList(),
+            isAffectedByWeather = WeatherEffect.FROST in weatherEffects,
+            rowType = GwentCardRow.MELEE
         )
         BattleRow(
             cards = field[GwentCardRow.RANGED] ?: emptyList(),
@@ -196,9 +167,9 @@ fun PlayerField(
             rowType = GwentCardRow.RANGED
         )
         BattleRow(
-            cards = field[GwentCardRow.MELEE] ?: emptyList(),
-            isAffectedByWeather = WeatherEffect.FROST in weatherEffects,
-            rowType = GwentCardRow.MELEE
+            cards = field[GwentCardRow.SIEGE] ?: emptyList(),
+            isAffectedByWeather = WeatherEffect.RAIN in weatherEffects,
+            rowType = GwentCardRow.SIEGE
         )
     }
 }
@@ -216,9 +187,9 @@ fun AiField(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         BattleRow(
-            cards = field[GwentCardRow.MELEE] ?: emptyList(),
-            isAffectedByWeather = WeatherEffect.FROST in weatherEffects,
-            rowType = GwentCardRow.MELEE
+            cards = field[GwentCardRow.SIEGE] ?: emptyList(),
+            isAffectedByWeather = WeatherEffect.RAIN in weatherEffects,
+            rowType = GwentCardRow.SIEGE
         )
         BattleRow(
             cards = field[GwentCardRow.RANGED] ?: emptyList(),
@@ -226,9 +197,9 @@ fun AiField(
             rowType = GwentCardRow.RANGED
         )
         BattleRow(
-            cards = field[GwentCardRow.SIEGE] ?: emptyList(),
-            isAffectedByWeather = WeatherEffect.RAIN in weatherEffects,
-            rowType = GwentCardRow.SIEGE
+            cards = field[GwentCardRow.MELEE] ?: emptyList(),
+            isAffectedByWeather = WeatherEffect.FROST in weatherEffects,
+            rowType = GwentCardRow.MELEE
         )
     }
 }
@@ -246,7 +217,6 @@ fun BattleRow(
             .background(Color.Black.copy(alpha = 0.4f))
             .padding(vertical = 4.dp)
     ) {
-        // Добавляем подпись ряда
         Text(
             text = when (rowType) {
                 GwentCardRow.SIEGE -> "Siege Units"
@@ -264,10 +234,8 @@ fun BattleRow(
                 .fillMaxWidth()
                 .height(80.dp)
                 .background(
-                    if (isAffectedByWeather) 
-                        Color.Gray.copy(alpha = 0.5f) 
-                    else 
-                        Color.Transparent
+                    if (isAffectedByWeather) Color.Gray.copy(alpha = 0.5f)
+                    else Color.Transparent
                 ),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             contentPadding = PaddingValues(horizontal = 8.dp)
@@ -311,14 +279,14 @@ fun WeatherEffects(
 @Composable
 fun ScorePanel(
     gameState: GwentGameState?,
-    modifier: Modifier = Modifier
+    onPassClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        // Счёт противника
         ScoreSection(
             label = "Opponent",
             currentScore = if (gameState != null) {
@@ -328,14 +296,22 @@ fun ScorePanel(
             isPassed = gameState?.aiPassed == true
         )
 
-        Divider(
-            color = Color.White.copy(alpha = 0.5f),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = "Round ${gameState?.currentRound ?: 1}",
+                color = Color.White,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(top = 16.dp)
+            )
 
-        // Счёт игрока
+            Button(onClick = onPassClick) {
+                Text("Pass")
+            }
+        }
+
         ScoreSection(
             label = "You",
             currentScore = if (gameState != null) {
@@ -343,14 +319,6 @@ fun ScorePanel(
             } else 0,
             roundsWon = gameState?.playerRoundsWon ?: 0,
             isPassed = gameState?.playerPassed == true
-        )
-
-        // Номер текущего раунда
-        Text(
-            text = "Round ${gameState?.currentRound ?: 1}",
-            color = Color.White,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(top = 16.dp)
         )
     }
 }
@@ -372,7 +340,7 @@ fun ScoreSection(
             color = Color.White,
             style = MaterialTheme.typography.titleMedium
         )
-        
+
         Text(
             text = currentScore.toString(),
             color = Color.White,
@@ -407,7 +375,6 @@ fun ScoreSection(
     }
 }
 
-// Вспомогательная функция для подсчета очков
 private fun calculateScore(
     field: Map<GwentCardRow, List<GwentCard>>,
     weatherEffects: List<WeatherEffect>
