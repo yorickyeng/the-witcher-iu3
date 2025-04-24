@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,7 +31,6 @@ import com.fk.thewitcheriu3.R
 import com.fk.thewitcheriu3.domain.RaccoonComing
 import com.fk.thewitcheriu3.domain.models.NavRoutes
 import com.fk.thewitcheriu3.ui.components.CellView
-import com.fk.thewitcheriu3.ui.components.MainMenuButton
 import com.fk.thewitcheriu3.ui.viewmodels.GameMapViewModel
 
 @Composable
@@ -122,7 +123,13 @@ fun GameMapScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                MainMenuButton("Save") { viewModel.saveGame(saveName) }
+                IconButton(
+                    onClick = { viewModel.saveGame(saveName) }) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_save_24),
+                        contentDescription = "save",
+                    )
+                }
 
                 Text(
                     text = "Move points left: ${movePoints}\n",
@@ -132,7 +139,13 @@ fun GameMapScreen(
                     fontFamily = FontFamily.Serif
                 )
 
-                MainMenuButton("Load") { navController.navigate(NavRoutes.SaveLoadMenu.route) }
+                IconButton(
+                    onClick = { navController.navigate(NavRoutes.SaveLoadMenu.route) }) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_upload_24),
+                        contentDescription = "load",
+                    )
+                }
             }
         }
 

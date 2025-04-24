@@ -34,7 +34,7 @@ import com.fk.thewitcheriu3.ui.viewmodels.GameMapCreatorViewModel
 @Composable
 fun GameMapCreatorScreen(
     navController: NavController,
-    viewModel: GameMapCreatorViewModel = viewModel()
+    viewModel: GameMapCreatorViewModel = viewModel(),
 ) {
     val gameMapCreator = viewModel.gameMapCreator
     viewModel.selectedType
@@ -103,6 +103,11 @@ fun GameMapCreatorScreen(
             }
 
             Spacer(Modifier.padding(vertical = 10.dp))
+
+            MainMenuButton(
+                text = "To Main Menu",
+                onClick = { navController.navigate(NavRoutes.MainMenu.route) }
+            )
         }
 
         Box(modifier = Modifier

@@ -24,19 +24,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.fk.thewitcheriu3.data.AppDatabase
-import com.fk.thewitcheriu3.data.AppDatabase.Companion.MIGRATION_1_2
 import com.fk.thewitcheriu3.data.AppDatabase.Companion.MIGRATION_2_3
 import com.fk.thewitcheriu3.data.GameMapRepository
 import com.fk.thewitcheriu3.data.GameMapRepositoryImpl
 import com.fk.thewitcheriu3.domain.PlayBackgroundMusic
 import com.fk.thewitcheriu3.domain.models.NavRoutes
-import com.fk.thewitcheriu3.ui.screens.MainMenu
-import com.fk.thewitcheriu3.ui.screens.SettingsScreen
 import com.fk.thewitcheriu3.ui.screens.GameMapCreatorScreen
 import com.fk.thewitcheriu3.ui.screens.GameMapScreen
+import com.fk.thewitcheriu3.ui.screens.GwentGameScreen
+import com.fk.thewitcheriu3.ui.screens.MainMenu
 import com.fk.thewitcheriu3.ui.screens.RecordsScreen
 import com.fk.thewitcheriu3.ui.screens.SaveLoadScreen
-import com.fk.thewitcheriu3.ui.screens.GwentGameScreen
+import com.fk.thewitcheriu3.ui.screens.SettingsScreen
 import com.fk.thewitcheriu3.ui.theme.TheWitcherIU3Theme
 import com.fk.thewitcheriu3.ui.viewmodels.GameMapViewModel
 

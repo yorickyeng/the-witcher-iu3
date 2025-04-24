@@ -22,7 +22,9 @@ import com.fk.thewitcheriu3.ui.components.MainMenuButton
 
 @Composable
 fun SettingsScreen(
-    navController: NavController, onChangeMusicClicked: () -> Unit, onStopMusicClicked: () -> Unit
+    navController: NavController,
+    onChangeMusicClicked: () -> Unit,
+    onStopMusicClicked: () -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -48,9 +50,12 @@ fun SettingsScreen(
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.Serif
             )
-            MainMenuButton("To Main Menu") { navController.navigate(NavRoutes.MainMenu.route) }
             MainMenuButton("Change Music", onChangeMusicClicked)
             MainMenuButton("Stop Music", onStopMusicClicked)
+            MainMenuButton(
+                text = "To Main Menu",
+                onClick = { navController.navigate(NavRoutes.MainMenu.route) }
+            )
         }
     }
 }
