@@ -27,7 +27,7 @@ import com.fk.thewitcheriu3.data.AppDatabase
 import com.fk.thewitcheriu3.data.AppDatabase.Companion.MIGRATION_2_3
 import com.fk.thewitcheriu3.data.GameMapRepository
 import com.fk.thewitcheriu3.data.GameMapRepositoryImpl
-import com.fk.thewitcheriu3.domain.PlayBackgroundMusic
+import com.fk.thewitcheriu3.domain.playBackgroundMusic
 import com.fk.thewitcheriu3.domain.models.NavRoutes
 import com.fk.thewitcheriu3.ui.screens.GameMapCreatorScreen
 import com.fk.thewitcheriu3.ui.screens.GameMapScreen
@@ -77,9 +77,9 @@ fun App() {
     var playPhonk by rememberSaveable { mutableStateOf(false) }
 
     val music: MediaPlayer = if (playPhonk) {
-        PlayBackgroundMusic(R.raw.slapper)
+        playBackgroundMusic(R.raw.slapper)
     } else {
-        PlayBackgroundMusic(R.raw.kaer_morhen)
+        playBackgroundMusic(R.raw.kaer_morhen)
     }
 
     val repository: GameMapRepository = LocalGameSavesRepository.current

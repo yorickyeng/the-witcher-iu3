@@ -8,7 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.fk.thewitcheriu3.R
 
 @Composable
-fun PlayBackgroundMusic(audiofile: Int): MediaPlayer {
+fun playBackgroundMusic(audiofile: Int): MediaPlayer {
     val context = LocalContext.current
 
     // Создаём MediaPlayer

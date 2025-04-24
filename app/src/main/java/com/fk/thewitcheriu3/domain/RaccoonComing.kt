@@ -35,8 +35,8 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun RaccoonComing(showRaccoon: Boolean) {
-    PlayBackgroundMusic(R.raw.raccoon_appearance)
-    PlayBackgroundMusic(R.raw.bober_kurwa)
+    playBackgroundMusic(R.raw.raccoon_appearance)
+    playBackgroundMusic(R.raw.bober_kurwa)
 
     var showOverlay by remember { mutableStateOf(false) } // затемнение и сообщение
     var isVisible by remember { mutableStateOf(false) } // анимация

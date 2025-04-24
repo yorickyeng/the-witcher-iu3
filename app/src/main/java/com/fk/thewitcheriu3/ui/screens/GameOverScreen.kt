@@ -18,11 +18,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fk.thewitcheriu3.R
-import com.fk.thewitcheriu3.domain.PlayBackgroundMusic
+import com.fk.thewitcheriu3.domain.playBackgroundMusic
 
 @Composable
 fun GameOverScreen(gameOver: String?, onClick: () -> Unit) {
-    PlayBackgroundMusic(R.raw.bober_kurwa)
+    playBackgroundMusic(R.raw.bober_kurwa)
 
     Box(
         modifier = Modifier
