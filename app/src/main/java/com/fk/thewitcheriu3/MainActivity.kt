@@ -32,7 +32,7 @@ import com.fk.thewitcheriu3.domain.models.NavRoutes
 import com.fk.thewitcheriu3.ui.screens.GameMapCreatorScreen
 import com.fk.thewitcheriu3.ui.screens.GameMapScreen
 import com.fk.thewitcheriu3.ui.screens.GwentGameScreen
-import com.fk.thewitcheriu3.ui.screens.MainMenu
+import com.fk.thewitcheriu3.ui.screens.MainMenuScreen
 import com.fk.thewitcheriu3.ui.screens.RecordsScreen
 import com.fk.thewitcheriu3.ui.screens.SaveLoadScreen
 import com.fk.thewitcheriu3.ui.screens.SettingsScreen
@@ -94,7 +94,7 @@ fun App() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = NavRoutes.MainMenu.route) {
         composable(NavRoutes.MainMenu.route) {
-            MainMenu(navController = navController)
+            MainMenuScreen(navController = navController)
         }
         composable(NavRoutes.NewGame.route) {
             GameMapScreen(

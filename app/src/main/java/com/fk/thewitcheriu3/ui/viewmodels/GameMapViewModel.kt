@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fk.thewitcheriu3.data.GameMapRepository
+import com.fk.thewitcheriu3.domain.measureDistance
 import com.fk.thewitcheriu3.domain.models.Cell
 import com.fk.thewitcheriu3.domain.models.GameMap
 import com.fk.thewitcheriu3.domain.models.characters.Character
@@ -23,13 +24,11 @@ import com.fk.thewitcheriu3.domain.models.characters.units.witchers.BearSchoolWi
 import com.fk.thewitcheriu3.domain.models.characters.units.witchers.CatSchoolWitcher
 import com.fk.thewitcheriu3.domain.models.characters.units.witchers.GWENTWitcher
 import com.fk.thewitcheriu3.domain.models.characters.units.witchers.WolfSchoolWitcher
-import com.fk.thewitcheriu3.domain.measureDistance
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlin.random.Random
-import kotlinx.serialization.json.Json
 
 class GameMapViewModel(
     private val repository: GameMapRepository

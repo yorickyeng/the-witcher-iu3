@@ -37,6 +37,7 @@ class GameMap(
     fun setPlayer(player: Player) {
         this.player = player
     }
+
     fun setComputer(computer: Computer) {
         this.computer = computer
     }
@@ -193,6 +194,7 @@ class GameMap(
             }
         }
 
+        updateCell(Cell(type = "tavern", xCoord = 0, yCoord = 0))
         updateCell(Cell(type = "Kaer Morhen", xCoord = 0, yCoord = 0))
         updateCell(Cell(type = "Zamek Stygga", xCoord = width - 1, yCoord = height - 1))
 
@@ -208,7 +210,7 @@ class GameMap(
         wolfSchoolWitcher.place(this)
         player.addUnit(wolfSchoolWitcher)
 
-        for (i in 5 until 8) {
+        repeat(3) {
             val drowner = Drowner()
             drowner.place(this)
             computer.addUnit(drowner)

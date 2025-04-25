@@ -3,8 +3,6 @@ package com.fk.thewitcheriu3.domain.models
 import com.fk.thewitcheriu3.R
 import com.fk.thewitcheriu3.domain.models.characters.heroes.Hero
 import com.fk.thewitcheriu3.domain.models.characters.units.Unit
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 data class Cell(
     val type: String,
@@ -17,6 +15,7 @@ data class Cell(
         "road" -> R.drawable.road
         "field" -> R.drawable.field
         "forest" -> R.drawable.forest
+        "tavern" -> R.drawable.tavern
         "Kaer Morhen" -> R.drawable.kaer_morhen
         "Zamek Stygga" -> R.drawable.stygga
         else -> R.drawable.field

@@ -19,7 +19,7 @@ import com.fk.thewitcheriu3.domain.models.NavRoutes
 import com.fk.thewitcheriu3.ui.components.MainMenuButton
 
 @Composable
-fun MainMenu(navController: NavController) {
+fun MainMenuScreen(navController: NavController) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -46,7 +46,7 @@ fun MainMenu(navController: NavController) {
             MainMenuButton("New Game") { navController.navigate(NavRoutes.NewGame.route) }
             MainMenuButton("Load Game") { navController.navigate(NavRoutes.SaveLoadMenu.route) }
             MainMenuButton("Records") { navController.navigate(NavRoutes.Records.route) }
-            MainMenuButton("Create Custom Map") { navController.navigate(NavRoutes.MapCreator.route) }
+            MainMenuButton("Custom Map") { navController.navigate(NavRoutes.MapCreator.route) }
             MainMenuButton("Settings") { navController.navigate(NavRoutes.Settings.route) }
             MainMenuButton("Gwent") { navController.navigate(NavRoutes.Gwent.route) }
         }
