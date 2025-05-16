@@ -1,8 +1,10 @@
 package com.fk.thewitcheriu3.ui.viewmodels
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -50,7 +52,7 @@ class GameMapViewModel(
     var cellsInAttackRange = mutableStateOf<Set<Pair<Int, Int>>>(emptySet())
         private set
 
-    var showBuyMenu = mutableStateOf(false)
+    var inKaerMorhen = mutableStateOf(false)
         private set
 
     var showRaccoon = mutableStateOf(false)
@@ -67,6 +69,59 @@ class GameMapViewModel(
 
     var playersMoney by mutableIntStateOf(player.money)
         private set
+
+    var inTavern = mutableStateOf(false)
+        private set
+
+    var gameTime by mutableLongStateOf(0L)
+        private set
+
+    private var gameTimeMillis by mutableLongStateOf(0L)
+
+    var isEating by mutableStateOf(false)
+    var eatingTimeLeft by mutableIntStateOf(0)
+    var eatingHealthBonus by mutableIntStateOf(0)
+
+    init {
+        startGameTimeTimer()
+    }
+
+    private fun startGameTimeTimer() {
+        viewModelScope.launch {
+            while (true) {
+                delay(100)
+                gameTimeMillis += 100
+                gameTime = gameTimeMillis / 100
+            }
+        }
+    }
+
+    fun startEating() {
+        if (!isEating) {
+            isEating = true
+            eatingTimeLeft = 15
+            eatingHealthBonus = 50
+
+            viewModelScope.launch {
+                while (eatingTimeLeft > 0) {
+                    delay(100)
+                    eatingTimeLeft--
+                }
+
+                player.health = (player.health + eatingHealthBonus)
+                isEating = false
+                eatingHealthBonus = 0
+            }
+        }
+    }
+
+    @SuppressLint("DefaultLocale")
+    fun getFormattedGameTime(): String {
+        val days = gameTime / (24 * 60)
+        val hours = (gameTime % (24 * 60)) / 60
+        val minutes = gameTime % 60
+        return String.format("%dd %02d:%02d", days, hours, minutes)
+    }
 
     fun getHighScores(): Flow<List<Pair<String, Int>>> = repository.getHighScores()
 
@@ -138,7 +193,7 @@ class GameMapViewModel(
         resetSelected()
 
         movesCounter.intValue = 0
-        showBuyMenu.value = false
+        inKaerMorhen.value = false
         gameOver.value = null
     }
 
@@ -186,10 +241,8 @@ class GameMapViewModel(
 
     private fun allyMoves(ally: Character, targetCell: Cell) {
         when (targetCell.type) {
-            // Если это мой замок
-            "Kaer Morhen" -> showBuyMenu.value = true
-
-            // Если это вражеский замок
+            "tavern" -> inTavern.value = true
+            "Kaer Morhen" -> inKaerMorhen.value = true
             "Zamek Stygga" -> {
                 computer.health = 0
                 gameOver.value = gameMap.checkGameOver()

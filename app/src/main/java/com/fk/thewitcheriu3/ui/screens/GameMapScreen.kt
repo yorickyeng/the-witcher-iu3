@@ -42,12 +42,13 @@ fun GameMapScreen(
     val selectedCell = viewModel.selectedCell
     val cellsInMoveRange = viewModel.cellsInMoveRange
     val cellsInAttackRange = viewModel.cellsInAttackRange
-    val showBuyMenu = viewModel.showBuyMenu
+    val inKaerMorhen = viewModel.inKaerMorhen
     val gameOver = viewModel.gameOver
     val showRaccoon = viewModel.showRaccoon
     val playersMoney = viewModel.playersMoney
     val movesCounter = viewModel.movesCounter
     val saveName = viewModel.saveName
+    var inTavern = viewModel.inTavern
     val movePoints = gameMap.getPlayer().units.size + 1 - movesCounter.intValue
 
     val systemBarPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -88,11 +89,18 @@ fun GameMapScreen(
             RaccoonComing(showRaccoon.value)
         }
 
-        if (showBuyMenu.value) {
-            BuyMenuScreen(
+        if (inKaerMorhen.value) {
+            KaerMorhenScreen(
                 onPlayGwent = { navController.navigate(NavRoutes.Gwent.route) },
                 onBuy = { viewModel.playerBuysUnit(it) },
-                onClose = { showBuyMenu.value = false })
+                onClose = { inKaerMorhen.value = false })
+        }
+
+        if (inTavern.value) {
+            TavernScreen(
+                onPlayGwent = { navController.navigate(NavRoutes.Gwent.route) },
+                onEat = { viewModel.startEating() },
+                onClose = { inTavern.value = false })
         }
 
         if (selectedCell.value != null) {
@@ -100,7 +108,7 @@ fun GameMapScreen(
             val info = viewModel.getCellInfo()
 
             Text(
-                text = "$info\nCell ($x, $y)",
+                text = "$info\n($x, $y)",
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .padding(16.dp),
@@ -111,7 +119,7 @@ fun GameMapScreen(
             )
         }
 
-        if (!showBuyMenu.value && !showRaccoon.value && gameOver.value == null) {
+        if (!inKaerMorhen.value && !showRaccoon.value && !inTavern.value && gameOver.value == null) {
             Row(
                 modifier = Modifier
                     .fillMaxSize()
@@ -150,7 +158,7 @@ fun GameMapScreen(
         }
 
         Text(
-            text = "Your money: $playersMoney orens",
+            text = "${viewModel.getFormattedGameTime()}\n$playersMoney orens",
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),

@@ -174,10 +174,6 @@ class GameMap(
     }
 
     private fun initDefaultMap() {
-        for (i in 0 until width) {
-            updateCell(Cell(type = "road", xCoord = i, yCoord = i))
-        }
-
         for (i in 0 until height / 2) {
             for (j in width / 2 until width) {
                 if (j >= i + 5) {
@@ -194,7 +190,19 @@ class GameMap(
             }
         }
 
-        updateCell(Cell(type = "tavern", xCoord = 0, yCoord = 0))
+        for (i in width / 2 until width) {
+            for (j in 0 until height / 2) {
+                if (i + j == width - 1) {
+                    updateCell(Cell(type = "road", xCoord = i, yCoord = j))
+                }
+            }
+        }
+
+        for (i in 0 until width) {
+            updateCell(Cell(type = "road", xCoord = i, yCoord = i))
+        }
+
+        updateCell(Cell(type = "tavern", xCoord = 9, yCoord = 0))
         updateCell(Cell(type = "Kaer Morhen", xCoord = 0, yCoord = 0))
         updateCell(Cell(type = "Zamek Stygga", xCoord = width - 1, yCoord = height - 1))
 

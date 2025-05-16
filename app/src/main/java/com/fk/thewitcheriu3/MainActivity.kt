@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(LocalGameSavesRepository provides gameRepository) {
                 TheWitcherIU3Theme {
                     Surface(color = MaterialTheme.colorScheme.background) {
-                        App()
+                        App(onQuit = { finishAffinity() })
                     }
                 }
             }
@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun App() {
+fun App(onQuit: () -> Unit) {
     var playPhonk by rememberSaveable { mutableStateOf(false) }
 
     val music: MediaPlayer = if (playPhonk) {
