@@ -10,11 +10,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -27,7 +30,6 @@ import com.fk.thewitcheriu3.data.AppDatabase
 import com.fk.thewitcheriu3.data.AppDatabase.Companion.MIGRATION_2_3
 import com.fk.thewitcheriu3.data.GameMapRepository
 import com.fk.thewitcheriu3.data.GameMapRepositoryImpl
-import com.fk.thewitcheriu3.domain.playBackgroundMusic
 import com.fk.thewitcheriu3.domain.models.NavRoutes
 import com.fk.thewitcheriu3.ui.screens.GameMapCreatorScreen
 import com.fk.thewitcheriu3.ui.screens.GameMapScreen
@@ -64,7 +66,7 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(LocalGameSavesRepository provides gameRepository) {
                 TheWitcherIU3Theme {
                     Surface(color = MaterialTheme.colorScheme.background) {
-                        App(onQuit = { finishAffinity() })
+                        App()
                     }
                 }
             }
@@ -73,15 +75,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun App(onQuit: () -> Unit) {
-    var playPhonk by rememberSaveable { mutableStateOf(false) }
-
-    val music: MediaPlayer = if (playPhonk) {
-        playBackgroundMusic(R.raw.slapper)
-    } else {
-        playBackgroundMusic(R.raw.kaer_morhen)
-    }
-
+fun App() {
     val repository: GameMapRepository = LocalGameSavesRepository.current
     val gameMapViewModel: GameMapViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
@@ -92,6 +86,44 @@ fun App(onQuit: () -> Unit) {
     )
 
     val navController = rememberNavController()
+    val context = LocalContext.current
+
+    var currentMusicRes by remember { mutableStateOf<Int?>(R.raw.kaer_morhen) }
+    var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
+
+    fun playMusic(resId: Int?) {
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
+
+        resId?.let { id ->
+            mediaPlayer = MediaPlayer.create(context, id).apply {
+                isLooping = true
+                start()
+            }
+        }
+    }
+
+    LaunchedEffect(navController) {
+        navController.currentBackStackEntryFlow.collect { backStackEntry ->
+            val currentScreen = when (backStackEntry.destination.route) {
+                NavRoutes.MainMenu.route -> NavRoutes.MainMenu
+                NavRoutes.NewGame.route -> NavRoutes.NewGame
+                NavRoutes.MapCreator.route -> NavRoutes.MapCreator
+                NavRoutes.Settings.route -> NavRoutes.Settings
+                NavRoutes.SaveLoadMenu.route -> NavRoutes.SaveLoadMenu
+                NavRoutes.Records.route -> NavRoutes.Records
+                NavRoutes.Gwent.route -> NavRoutes.Gwent
+                else -> null
+            }
+
+            if (currentScreen?.musicResId != currentMusicRes) {
+                currentMusicRes = currentScreen?.musicResId
+                playMusic(currentMusicRes)
+            }
+        }
+    }
+
     NavHost(navController = navController, startDestination = NavRoutes.MainMenu.route) {
         composable(NavRoutes.MainMenu.route) {
             MainMenuScreen(navController = navController)
@@ -106,8 +138,8 @@ fun App(onQuit: () -> Unit) {
         composable(NavRoutes.Settings.route) {
             SettingsScreen(
                 navController = navController,
-                onChangeMusicClicked = { playPhonk = !playPhonk },
-                onStopMusicClicked = { music.stop() })
+                onChangeMusicClicked = {  },
+                onStopMusicClicked = {  })
         }
         composable(NavRoutes.SaveLoadMenu.route) {
             SaveLoadScreen(
@@ -126,6 +158,12 @@ fun App(onQuit: () -> Unit) {
                 navController = navController,
                 viewModel = viewModel()
             )
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            mediaPlayer?.release()
         }
     }
 

@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fk.thewitcheriu3.R
+import com.fk.thewitcheriu3.domain.models.SpotType
 import com.fk.thewitcheriu3.domain.models.characters.units.witchers.BearSchoolWitcher
 import com.fk.thewitcheriu3.domain.models.characters.units.witchers.CatSchoolWitcher
 import com.fk.thewitcheriu3.domain.models.characters.units.witchers.GWENTWitcher
@@ -35,6 +36,7 @@ import com.fk.thewitcheriu3.domain.models.characters.units.witchers.WolfSchoolWi
 fun KaerMorhenScreen(
     onPlayGwent: () -> Unit,
     onBuy: (String) -> Unit,
+    onShowSpots: (SpotType) -> Unit,
     onClose: () -> Unit
 ) {
     val witchers = listOf(
@@ -92,13 +94,13 @@ fun KaerMorhenScreen(
                 }
 
                 Button(
-                    onClick = onPlayGwent, modifier = Modifier.padding(8.dp)
+                    onClick = { onShowSpots(SpotType.TABLE) }, modifier = Modifier.padding(8.dp)
                 ) {
                     Text("Grab something to eat")
                 }
 
                 Button(
-                    onClick = onPlayGwent, modifier = Modifier.padding(8.dp)
+                    onClick = { onShowSpots(SpotType.BED) }, modifier = Modifier.padding(8.dp)
                 ) {
                     Text("Have some rest")
                 }
@@ -125,6 +127,6 @@ fun KaerMorhenScreen(
 fun KaerMorhenPreview() {
     KaerMorhenScreen(
         onBuy = {}, onClose = {},
-        onPlayGwent = {}
+        onPlayGwent = {}, onShowSpots = {}
     )
 }

@@ -5,12 +5,14 @@ import com.fk.thewitcheriu3.domain.models.GameMap
 
 interface Character {
     var health: Int
-    val damage: Int
-    val moveRange: Int
-    val attackRange: Int
+    var damage: Int
+    var moveRange: Int
+    var attackRange: Int
     val xCoord: Int
     val yCoord: Int
     val texture: Int
+
+    fun getName(): String
 
     fun getPosition() = Pair(xCoord, yCoord)
 

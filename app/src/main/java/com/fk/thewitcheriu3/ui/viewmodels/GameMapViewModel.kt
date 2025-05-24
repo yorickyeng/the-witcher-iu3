@@ -10,9 +10,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fk.thewitcheriu3.data.GameMapRepository
+import com.fk.thewitcheriu3.domain.ActivityManager
 import com.fk.thewitcheriu3.domain.measureDistance
+import com.fk.thewitcheriu3.domain.models.ActivityType
 import com.fk.thewitcheriu3.domain.models.Cell
 import com.fk.thewitcheriu3.domain.models.GameMap
+import com.fk.thewitcheriu3.domain.models.NpcSpot
+import com.fk.thewitcheriu3.domain.models.SpotType
 import com.fk.thewitcheriu3.domain.models.characters.Character
 import com.fk.thewitcheriu3.domain.models.characters.heroes.Computer
 import com.fk.thewitcheriu3.domain.models.characters.heroes.Hero
@@ -35,6 +39,8 @@ import kotlin.random.Random
 class GameMapViewModel(
     private val repository: GameMapRepository
 ) : ViewModel() {
+
+    private val activityManager = ActivityManager()
 
     var gameMap by mutableStateOf(GameMap(10, 10))
         private set
@@ -78,41 +84,122 @@ class GameMapViewModel(
 
     private var gameTimeMillis by mutableLongStateOf(0L)
 
-    var isEating by mutableStateOf(false)
-    var eatingTimeLeft by mutableIntStateOf(0)
-    var eatingHealthBonus by mutableIntStateOf(0)
+    var showSpotsScreen = mutableStateOf(false)
+        private set
+
+    var currentSpotType = mutableStateOf<SpotType?>(null)
+        private set
+
+    private var toastMessage = mutableStateOf<String?>(null)
+    val availableSpots = mutableStateOf<List<NpcSpot>>(emptyList())
 
     init {
-        startGameTimeTimer()
+        startGameTime()
     }
 
-    private fun startGameTimeTimer() {
+    private fun startGameTime() {
         viewModelScope.launch {
             while (true) {
                 delay(100)
                 gameTimeMillis += 100
                 gameTime = gameTimeMillis / 100
+                activityManager.updateSpots(gameTime)
+                activityManager.randomlyOccupySpots(gameTime)
             }
         }
     }
 
-    fun startEating() {
-        if (!isEating) {
-            isEating = true
-            eatingTimeLeft = 15
-            eatingHealthBonus = 50
+    fun showSpots(type: SpotType) {
+        currentSpotType.value = type
+        if (type != SpotType.BAR) showSpotsScreen.value = true
+        else drinkVODKA()
+    }
 
-            viewModelScope.launch {
-                while (eatingTimeLeft > 0) {
-                    delay(100)
-                    eatingTimeLeft--
-                }
+    fun drinkVODKA() {
+        selectedCharacter = gameMap.map[0][9].hero ?: gameMap.map[0][9].unit
+        toastMessage.value = "What have you done to yourself???"
+        selectedCharacter?.let { character ->
+            character.health -= 50
+            character.attackRange = (character.attackRange - 3).coerceAtLeast(1)
+            character.moveRange = (character.moveRange - 3).coerceAtLeast(1)
+            character.damage += 100
+        }
+    }
 
-                player.health = (player.health + eatingHealthBonus)
-                isEating = false
-                eatingHealthBonus = 0
+    fun hideSpots() {
+        showSpotsScreen.value = false
+        currentSpotType.value = null
+    }
+
+    fun getAvailableSpots(): List<NpcSpot> {
+        val location = if (inKaerMorhen.value) "Kaer Morhen" else "tavern"
+        return activityManager.getAvailableSpots(location, currentSpotType.value!!)
+    }
+
+    fun updateAvailableSpots() {
+        val location = if (inKaerMorhen.value) "Kaer Morhen" else "tavern"
+        val type = currentSpotType.value ?: return
+        availableSpots.value = activityManager.getAvailableSpots(location, type)
+    }
+
+    fun occupySpot(spot: NpcSpot) {
+        selectedCharacter = when (inTavern.value) {
+            true -> gameMap.map[0][9].hero ?: gameMap.map[0][9].unit
+            false -> gameMap.map[0][0].hero ?: gameMap.map[0][0].unit
+        }
+        selectedCharacter?.let { character ->
+            if (activityManager.isCharacterActive(character)) {
+                toastMessage.value = "Character is already busy with another activity"
+                return
+            }
+
+            val duration = when (currentSpotType.value) {
+                SpotType.BED -> gameTime + 480 // 8 hours
+                SpotType.TABLE -> gameTime + 180 // 3 hours
+                SpotType.BAR -> gameTime + Random.nextLong(10, 1000)
+                null -> return
+            }
+
+            activityManager.occupySpot(
+                spot = spot,
+                character = character,
+                activityType = if (currentSpotType.value == SpotType.BED) ActivityType.SLEEPING else ActivityType.EATING,
+                duration = duration,
+            )
+
+            if (currentSpotType.value == SpotType.BED) {
+                toastMessage.value = "${character.getName()} is sleeping for 8 hours"
+            } else {
+                toastMessage.value = "${character.getName()} is eating for 3 hours"
+            }
+
+            selectedCell.value = character.getPosition()
+            cellsInMoveRange.value = emptySet()
+            cellsInAttackRange.value = emptySet()
+
+            showSpotsScreen.value = false
+            currentSpotType.value = null
+        }
+    }
+
+    fun getCharacterActivityInfo(character: Character): String? {
+        return activityManager.getCharacterActivity(character)?.let { (type, endTime) ->
+            val remainingTime = endTime - gameTime
+            val hours = remainingTime / 60
+            val minutes = remainingTime % 60
+            when (type) {
+                ActivityType.SLEEPING -> "Sleeping (${hours}h ${minutes}m left)"
+                ActivityType.EATING -> "Eating (${hours}h ${minutes}m left)"
             }
         }
+    }
+
+    fun isCharacterActive(character: Character): Boolean {
+        return activityManager.isCharacterActive(character)
+    }
+
+    fun getSpotOccupationTime(spot: NpcSpot): String {
+        return activityManager.getSpotOccupationTime(spot, gameTime)
     }
 
     @SuppressLint("DefaultLocale")
@@ -161,14 +248,12 @@ class GameMapViewModel(
         selectedCharacter?.let { selectedChar ->
             // Если персонаж уже выбран
             // Здесь cell - 2я выбранная клетка (выбор места движения или атаки)
-
             selectedCharacterMoveAndAttackLogic(selectedChar, targetCell = cell)
             changeTurn()
             resetSelected()
         } ?: run {
             // Если персонаж ещё не выбран
             // Здесь cell - 1я выбранная клетка (выбор союзника)
-
             when {
                 cell.hero is Hero -> selectedCharacter = cell.hero
                 cell.unit is Unit -> selectedCharacter = cell.unit
@@ -239,9 +324,21 @@ class GameMapViewModel(
         }
     }
 
+    private fun isTavernOpen(): Boolean {
+        val currentHour = (gameTime % (24 * 60)) / 60
+        return currentHour in 22..23 || currentHour in 0..5
+    }
+
     private fun allyMoves(ally: Character, targetCell: Cell) {
         when (targetCell.type) {
-            "tavern" -> inTavern.value = true
+            "tavern" -> {
+                if (!isTavernOpen()) {
+                    toastMessage.value = "The tavern is closed. It's open from 22:00 to 6:00"
+                    return
+                }
+                inTavern.value = true
+            }
+
             "Kaer Morhen" -> inKaerMorhen.value = true
             "Zamek Stygga" -> {
                 computer.health = 0
@@ -391,5 +488,11 @@ class GameMapViewModel(
 
             delay(60000) // задержка перед следующим появлением енота 60 секунд
         }
+    }
+
+    fun getToastMessage(): String? {
+        val message = toastMessage.value
+        toastMessage.value = null
+        return message
     }
 }

@@ -10,9 +10,9 @@ abstract class Hero protected constructor(
 ) : Character {
 
     override var health = 300
-    override val damage = 100
-    override val moveRange = 4
-    override val attackRange = 2
+    override var damage = 100
+    override var moveRange = 4
+    override var attackRange = 2
     abstract override val texture: Int
 
     var money: Int = 200
@@ -52,5 +52,5 @@ abstract class Hero protected constructor(
         units.add(unit)
     }
 
-    fun getName() = name
+    override fun getName() = name
 }

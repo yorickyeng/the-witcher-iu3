@@ -32,3 +32,18 @@ fun playBackgroundMusic(audiofile: Int): MediaPlayer {
 
     return mediaPlayer
 }
+
+//@Composable
+//fun playBackgroundMusic(audiofile: Int): MediaPlayer {
+//    val context = LocalContext.current
+//
+//    return remember(audiofile) {
+//        MediaPlayer.create(context, audiofile).apply {
+//            if (audiofile != R.raw.raccoon_appearance && audiofile != R.raw.bober_kurwa) {
+//                isLooping = true
+//            } else {
+//                setVolume(2.0f, 2.0f)
+//            }
+//        }
+//    }
+//}

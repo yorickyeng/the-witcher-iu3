@@ -24,7 +24,7 @@ class GameMap(
         }
     }
 
-    private var player = Player(name = "Cirilla Fiona Elen Riannon", 0, 1, this)
+    private var player = Player(name = "Cirilla", 0, 1, this)
     private var computer = Computer(name = "Vilgefortz of Roggeveen", 9, 8, this)
 
     internal var units: List<Unit> = player.units + computer.units

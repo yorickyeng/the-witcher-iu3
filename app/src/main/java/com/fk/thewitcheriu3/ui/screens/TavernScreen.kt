@@ -22,11 +22,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fk.thewitcheriu3.R
+import com.fk.thewitcheriu3.domain.models.SpotType
 
 @Composable
 fun TavernScreen(
     onPlayGwent: () -> Unit,
-    onEat: () -> Unit,
+    onShowSpots: (SpotType) -> Unit,
     onClose: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -60,13 +61,19 @@ fun TavernScreen(
             }
 
             Button(
-                onClick = onEat, modifier = Modifier.padding(8.dp)
+                onClick = { onShowSpots(SpotType.BAR) }, modifier = Modifier.padding(8.dp)
+            ) {
+                Text("Drink VODKA!")
+            }
+
+            Button(
+                onClick = { onShowSpots(SpotType.TABLE) }, modifier = Modifier.padding(8.dp)
             ) {
                 Text("Grab something to eat")
             }
 
             Button(
-                onClick = onPlayGwent, modifier = Modifier.padding(8.dp)
+                onClick = { onShowSpots(SpotType.BED) }, modifier = Modifier.padding(8.dp)
             ) {
                 Text("Have some rest")
             }
@@ -86,6 +93,6 @@ fun TavernPreview() {
     TavernScreen(
         onClose = {},
         onPlayGwent = {},
-        onEat = {},
+        onShowSpots = {}
     )
 }

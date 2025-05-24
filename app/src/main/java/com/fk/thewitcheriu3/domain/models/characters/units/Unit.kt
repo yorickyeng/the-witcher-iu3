@@ -7,9 +7,9 @@ import com.fk.thewitcheriu3.domain.models.GameMap
 abstract class Unit protected constructor(
     private val type: String,
     override var health: Int,
-    override val damage: Int,
-    override val moveRange: Int,
-    override val attackRange: Int,
+    override var damage: Int,
+    override var moveRange: Int,
+    override var attackRange: Int,
     private val price: Int
 ) : Character {
 
@@ -19,6 +19,7 @@ abstract class Unit protected constructor(
 
     fun getType() = type
     fun getPrice() = price
+    override fun getName() = type
 
     override fun place(gameMap: GameMap) {
         gameMap.updateCell(
